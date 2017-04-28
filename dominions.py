@@ -6,6 +6,7 @@ import argparse
 import io
 import json
 import time
+from datetime import datetime
 from subprocess import check_call
 import hashlib, binascii
 
@@ -80,6 +81,18 @@ chain_template = """{user_number}\r
 """
 
 
+# This must be set before any chdir() call
+global source_dir
+abspath = os.path.abspath(__file__)
+source_dir = os.path.dirname(abspath)
+
+
+def get_source_dir():
+    """Directory of the python executable"""
+    global source_dir
+    return source_dir
+
+
 def call(args, shell=False):
     print(' '.join(args))
     check_call(args, shell=shell)
@@ -92,22 +105,21 @@ def dosemu(args):
     call(cmd)
 
 
-def get_source_dir():
-    abspath = os.path.abspath(__file__)
-    dir_name = os.path.dirname(abspath)
-    return dir_name
 
-
-def install(source, target):
-    if os.path.exists(target):
-        raise Exception("Refusing to install into existing directory " + target)
-    os.mkdir(target)
-    os.chdir(target)
+def install(source):
+    """Our current directory should be an empty game directory"""
+    if os.path.exists('DOMIN2.EXE'):
+        raise Exception("Refusing to install over an existing game")
     call(['unzip', os.path.join(source, 'dom2v20b.zip')])
     call(['unzip', 'DOM2.EXE'])
-    dosemurc = os.path.join(source, 'dosemurc')
+
+
+def initialize_game(gamedb):
+    dosemurc = os.path.join(get_source_dir(), 'dosemurc')
     cmd = 'echo -n "y" | dosemu -dumb -f ' + dosemurc + ' RESETDOM.EXE'
     call(cmd, shell=True)
+    gamedb.db['initialized'] = True
+    gamedb.save()
 
 
 def hash_password(password, salt):
@@ -124,11 +136,10 @@ def write_chain_file(fname, chain_data):
 
 def run_turns(gamedb):
     last_turn = gamedb.get_turn_timestamp()
-    t = time.time()
-    dt = t - last_turn
+    t = datetime.utcnow()
+    dt = (t - last_turn).total_seconds()
     period = gamedb.get_turn_period()
     if dt > period:
-        os.chdir(gamedb.gamedir)
         dosemu(['DOMEVENT.EXE'])
         gamedb.save_turn_timestamp()
 
@@ -139,18 +150,17 @@ def run(username, gamedb):
     chain['user_number'] = u['id']
     chain['user_alias'] = username
     chain['user_real_name'] = username
-    write_chain_file(os.path.join(gamedb.gamedir, 'CHAIN.TXT'), chain)
-    os.chdir(gamedb.gamedir)
+    write_chain_file('CHAIN.TXT', chain)
     dosemu(['DOMIN2.EXE'])
 
 
 class GameDB(object):
-    def __init__(self, gamedir):
-        self.gamedir = gamedir
-        self.fname = os.path.join(gamedir, 'gamedb.json')
+    def __init__(self):
+        self.fname = 'gamedb.json'
         self.db = {
                 'users': {},
-                'turn_period': 60 * 60 * 24
+                'turn_period': 60 * 60 * 24,
+                'initialized': False
                 }
 
     def load(self):
@@ -182,10 +192,13 @@ class GameDB(object):
         self.save()
 
     def get_turn_timestamp(self):
-        return self.db['turn_timestamp']
+        v = self.db['turn_timestamp']
+        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5])
+        return dt
 
     def save_turn_timestamp(self):
-        self.db['turn_timestamp'] = time.time()
+        now = datetime.utcnow()
+        self.db['turn_timestamp'] = list(now.utctimetuple())
         self.save()
 
     def get_turn_period(self):
@@ -212,7 +225,13 @@ class GameDB(object):
         for idx, username in enumerate(usernames):
             print('%i. %s' % (idx + 1, username))
         idx = input('User number? ')
-        idx = int(idx) - 1
+        try:
+            idx = int(idx) - 1
+        except ValueError as e:  # Might be username string
+            if idx in usernames:
+                return idx
+            else:
+                raise Exception("Invalid user selection.")
         if idx >= 0 and idx < len(usernames):
             return usernames[idx]
         else:
@@ -245,22 +264,31 @@ def main():
 
     args = parser.parse_args()
 
-    lock = filelock.FileLock(os.path.join(args.gamedir, "lockfile"))
+    # Create the game direcotry if it does not already exist
+    if args.cmd == 'install':
+        args.gamedir = args.target
+    if not os.path.exists(args.gamedir):
+        os.mkdir(args.gamedir)
+    elif not os.path.exists(os.path.join(args.gamedir, 'gamedb.json')):
+        raise Exception("No Game Database in directory " + args.gamedir)
+    os.chdir(args.gamedir)
+
+    lock = filelock.FileLock("lockfile")
     try:
         with lock.acquire(timeout=5):
 
-            gamedb = GameDB(args.gamedir)
+            gamedb = GameDB()
             gamedb.load()
 
             if args.cmd == 'install':
-                install(args.source, args.target)
+                install(args.source)
+                gamedb.save_turn_timestamp()
                 gamedb.save()
             elif args.cmd == 'add':
                 gamedb.add_user(args.user, args.password)
             elif args.cmd == 'rm':
                 gamedb.rm_user(args.user)
             elif args.cmd == 'turn':
-                os.chdir(gamedb.gamedir)
                 dosemu(['DOMEVENT.EXE'])
                 gamedb.save_turn_timestamp()
             elif args.cmd == 'run':
@@ -279,13 +307,17 @@ def main():
                             if correct:
                                 break
                             else:
+                                print("!!!")
                                 print("Wrong username or password")
+                                print("!!!")
                 else:
                     username = args.user
+                if not gamedb.db['initialized']:
+                    initialize_game(gamedb)
                 run_turns(gamedb)
                 run(username, gamedb)
     except filelock.Timeout:
-        print("Someone else is playing, try again later")
+        print("Someone else is playing, try again later.")
 
 
 if __name__ == '__main__':

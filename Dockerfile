@@ -24,7 +24,7 @@ WORKDIR /home/dominions
 ADD dom2v20b.zip dom2v20b.zip
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
-#RUN chmod a+x dominions.py
+ADD profile .profile
 RUN ./dominions.py install gamedir
 
 USER root
