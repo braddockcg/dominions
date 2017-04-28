@@ -1,0 +1,51 @@
+*******************************************************************************
+*                                                                             *
+*                           CHAIN.TXT Definition File                         *
+*                                   by MrBill                                 *
+*                                                                             *
+*	I don't think that anyone has fully documented what everything in the *
+* CHAIN.TXT file is. I could be wrong; I could be right. I could be black; I  *
+* could be white. Uh oh! PIL lyrics are creeping into my brain! Anyways, if   *
+* you ever did want to know what all the information in CHAIN.TXT is, here's  *
+* the information. It could be useful to someone who plans on writing a DOOR, *
+* online program, or conversion program for WWIV.                             *
+*                                                                             *
+* MrBill                                                                      *
+* WWIVnet Address 1 @ 7300 [MrBill's Abode 703-369-6140]                      *
+* Compuserve Address 71001,1101                                               *
+* GEnie Address, oh hell, i forgot!                                           *
+*                                                                             *
+*******************************************************************************
+-----------------------------------CHAIN.TXT-----------------------------------
+1                                     User number
+MRBILL                                User alias
+Bill                                  User real name
+                                      User callsign (HAM radio)
+21                                    User age
+M                                     User sex
+  16097.00                            User gold
+05/19/89                              User last logon date
+80                                    User colums
+25                                    User width
+255                                   User security level (0-255)
+1                                     1 if Co-SysOp, 0 if not
+1                                     1 if SysOp, 0 if not
+1                                     1 if ANSI, 0 if not
+0                                     1 if at remote, 0 if local console
+   2225.78                            User number of seconds left till logoff
+F:\WWIV\GFILES\                       System GFILES directory (gen. txt files)
+F:\WWIV\DATA\                         System DATA directory 
+890519.LOG                            System log of the day
+KB                                    User baud rate
+2                                     System com port
+MrBill's Abode (the original)         System name
+The incredible inedible MrBill        System SysOp
+83680                                 Time user logged on/# of secs. from midn.
+554                                   User number of seconds on system so far
+5050                                  User number of uploaded k
+22                                    User number of uploads
+42                                    User amount of downloaded k
+1                                     User number of downloads
+8N1                                   User parity
+--------------------------------------EOF--------------------------------------
+

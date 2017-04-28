@@ -1,0 +1,11 @@
+ifdef u_virtual  
+serial { virtual com 1 }
+endif
+
+$_sound = (0)
+$_cpu = "80586"
+$_hogthreshold = (10)
+$_dpmi_base = (0x10000000)
+$_external_char_set = "cp437"
+$_internal_char_set = "cp437"
+$_layout = "us"
