@@ -6,7 +6,7 @@ import argparse
 import io
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from subprocess import check_call
 import hashlib, binascii
 
@@ -135,13 +135,10 @@ def write_chain_file(fname, chain_data):
 
 
 def run_turns(gamedb):
-    last_turn = gamedb.get_turn_timestamp()
-    t = datetime.utcnow()
-    dt = (t - last_turn).total_seconds()
-    period = gamedb.get_turn_period()
-    if dt > period:
+    now = datetime.utcnow()
+    while now > gamedb.get_next_turn_timestamp():
         dosemu(['DOMEVENT.EXE'])
-        gamedb.save_turn_timestamp()
+        gamedb.increment_turn_timestamp()
 
 
 def run(username, gamedb):
@@ -203,6 +200,22 @@ class GameDB(object):
 
     def get_turn_period(self):
         return self.db['turn_period']
+
+    def get_next_turn_timestamp(self):
+        v = self.db['next_turn_timestamp']
+        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5])
+        return dt
+
+    def save_next_turn_timestamp(self, timestamp):
+        self.db['next_turn_timestamp'] = list(timestamp.utctimetuple())
+        self.save()
+
+    def increment_turn_timestamp(self):
+        period = self.db['turn_period']
+        last = self.get_next_turn_timestamp()
+        nxt = last + timedelta(seconds=period)
+        self.save_next_turn_timestamp(nxt)
+        self.save_turn_timestamp()
 
     def rm_user(self, username):
         del self.db['users'][username]
@@ -282,6 +295,8 @@ def main():
 
             if args.cmd == 'install':
                 install(args.source)
+                nxt = datetime.utcnow() + timedelta(seconds=gamedb.db['turn_period'])
+                gamedb.save_next_turn_timestamp(nxt)
                 gamedb.save_turn_timestamp()
                 gamedb.save()
             elif args.cmd == 'add':
@@ -290,7 +305,7 @@ def main():
                 gamedb.rm_user(args.user)
             elif args.cmd == 'turn':
                 dosemu(['DOMEVENT.EXE'])
-                gamedb.save_turn_timestamp()
+                gamedb.increment_turn_timestamp()
             elif args.cmd == 'run':
                 if args.user is None:
                     while True:
