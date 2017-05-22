@@ -106,17 +106,37 @@ def dosemu(args):
 
 
 
-def install(source):
-    """Our current directory should be an empty game directory"""
+def install_dom2(source):
+    """Install Dominions ][.
+    Our current directory should be an empty game directory"""
     if os.path.exists('DOMIN2.EXE'):
         raise Exception("Refusing to install over an existing game")
     call(['unzip', os.path.join(source, 'dom2v20b.zip')])
     call(['unzip', 'DOM2.EXE'])
 
 
+def install(source):
+    """Install the original Dominions.
+    Our current directory should be an empty game directory"""
+    if os.path.exists('DOMINION.EXE'):
+        raise Exception("Refusing to install over an existing game")
+    # We unzip to both output dir and DOM subdir.  Bit of a hack.
+    # To keep dosemu happy that the output dir is C: and that game data
+    # files reside in C:\DOM (which is hard-coded)
+    call(['unzip', os.path.join(source, 'DOM500.ZIP')])
+    os.mkdir('DOM')
+    os.chdir('DOM')
+    call(['unzip', os.path.join(source, 'DOM500.ZIP')])
+    os.chdir('..')
+
+
 def initialize_game(gamedb):
+    """This will initialize both Dominions ][ and the original Dominions"""
     dosemurc = os.path.join(get_source_dir(), 'dosemurc')
-    cmd = 'echo -n "y" | dosemu -dumb -f ' + dosemurc + ' RESETDOM.EXE'
+    if gamedb.is_version_1():
+        cmd = 'dosemu -dumb -f ' + dosemurc + ' DOM/RESETDOM.EXE'
+    else:
+        cmd = 'echo -n "y" | dosemu -dumb -f ' + dosemurc + ' RESETDOM.EXE'
     call(cmd, shell=True)
     gamedb.db['initialized'] = True
     gamedb.save()
@@ -141,7 +161,7 @@ def run_turns(gamedb):
         gamedb.increment_turn_timestamp()
 
 
-def run(username, gamedb):
+def run_dom2(username, gamedb):
     chain = {}
     u = gamedb.db['users'][username]
     chain['user_number'] = u['id']
@@ -151,13 +171,24 @@ def run(username, gamedb):
     dosemu(['DOMIN2.EXE'])
 
 
+def run(username, gamedb):
+    chain = {}
+    u = gamedb.db['users'][username]
+    chain['user_number'] = u['id']
+    chain['user_alias'] = username
+    chain['user_real_name'] = username
+    write_chain_file('CHAIN.TXT', chain)
+    dosemu(['DOMINION.EXE', 'CHAIN.TXT'])
+
+
 class GameDB(object):
     def __init__(self):
         self.fname = 'gamedb.json'
         self.db = {
                 'users': {},
                 'turn_period': 60 * 60 * 24,
-                'initialized': False
+                'initialized': False,
+                'version': 1
                 }
 
     def load(self):
@@ -217,6 +248,15 @@ class GameDB(object):
         self.save_next_turn_timestamp(nxt)
         self.save_turn_timestamp()
 
+    def set_version(self, version):
+        self.db['version'] = version
+
+    def get_version(self):
+        return self.db['version']
+
+    def is_version_1(self):
+        return self.db['version'] == 1
+
     def rm_user(self, username):
         del self.db['users'][username]
         self.save()
@@ -262,6 +302,8 @@ def main():
     install_parser.add_argument('target', help='Directory to install a new Dominions Game into')
     install_parser.add_argument('--source', required=False, default=get_source_dir(), 
             help='(optional) Directory to install a new Dominions Game FROM')
+    install_parser.add_argument('--dom2', required=False, default=False, action='store_true',
+            help='Install Sean Braids Dominions ][ fork')
 
     add_parser = subparsers.add_parser('add', help='Add a new user')
     add_parser.add_argument('user', help='username to add')
@@ -294,7 +336,11 @@ def main():
             gamedb.load()
 
             if args.cmd == 'install':
-                install(args.source)
+                if args.dom2:
+                    install_dom2(args.source)
+                    gamedb.set_version(2)
+                else:
+                    install(args.source)
                 nxt = datetime.utcnow() + timedelta(seconds=gamedb.db['turn_period'])
                 gamedb.save_next_turn_timestamp(nxt)
                 gamedb.save_turn_timestamp()
@@ -329,8 +375,13 @@ def main():
                     username = args.user
                 if not gamedb.db['initialized']:
                     initialize_game(gamedb)
-                run_turns(gamedb)
-                run(username, gamedb)
+                if not gamedb.is_version_1():
+                    # Dominions 2 requires explicit running of the nightly maintenance,
+                    # the original dominions runs it automatically on user login
+                    run_turns(gamedb)
+                    run_dom2(username, gamedb)
+                else:
+                    run(username, gamedb)
     except filelock.Timeout:
         print("Someone else is playing, try again later.")
 
