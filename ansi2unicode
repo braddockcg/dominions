@@ -37,12 +37,62 @@ def read_codemap(fname):
     return table
 
 
+def ansi_add(s, n):
+    if len(s) == 0:
+        s = "\x1b["
+    else:
+        s += ";"
+    s += str(n)
+    return s
+
+
+def wwiv(x):
+    """Accepts a one byte WWIV graphics code and outputs ANSI"""
+
+    # Default user WWIV color mapping in WWIV.INI
+    newuser_color = [7, 11, 14, 13, 31, 10, 12, 9, 5, 3]
+
+    # Mapping from WWIV color codes to ANSI color codes
+    ansi_map = [0, 4, 2, 6, 1, 5, 3, 7]
+
+    if x < len(newuser_color):
+        x = newuser_color[x]
+
+    wwiv_fg_bold = (x & 0x08) >> 3
+    wwiv_fg_italics = (x & 0x80) >> 7
+    wwiv_fg = x & 0x07
+    wwiv_bg = (x & 0x70) >> 4
+
+    ansi = ''
+    ansi = ansi_add(ansi, wwiv_fg_bold)
+    ansi = ansi_add(ansi, wwiv_fg_italics)
+    ansi = ansi_add(ansi, 30 + ansi_map[wwiv_fg])
+    ansi = ansi_add(ansi, 40 + ansi_map[wwiv_bg])
+
+    #if x == 0x3e:  # Clear screen???
+    #    print("Clear Screen")
+    #    return '\x1b[2J\x1b[1;1H'
+
+    if len(ansi) > 0:
+        ansi += 'm'
+    return ansi
+
+
 table = read_codemap(os.path.join(get_source_dir(), 'CP437.TXT'))
+
+wwiv_esc = False
 
 while True:
     c = sys.stdin.buffer.read(1)
     if len(c) == 0:
         break
-    uni = table.get(c[0], chr(c[0]))
+    if c[0] == 0x3:  # WWIV Ctrl-C Code
+        wwiv_esc = True
+        continue
+    if wwiv_esc:
+        wwiv_esc = False
+        uni = wwiv(c[0])
+    else:
+        uni = table.get(c[0], chr(c[0]))
     sys.stdout.write(uni)
     sys.stdout.flush()
