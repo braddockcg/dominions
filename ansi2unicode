@@ -46,7 +46,7 @@ def ansi_add(s, n):
     return s
 
 
-def wwiv(x):
+def wwiv(ch):
     """Accepts a one byte WWIV graphics code and outputs ANSI"""
 
     # Default user WWIV color mapping in WWIV.INI
@@ -54,9 +54,12 @@ def wwiv(x):
 
     # Mapping from WWIV color codes to ANSI color codes
     ansi_map = [0, 4, 2, 6, 1, 5, 3, 7]
+    
+    x = ch - ord('0')
 
-    if x < len(newuser_color):
-        x = newuser_color[x]
+    if x >= len(newuser_color):
+        return "UNK(" + ch + ")"
+    x = newuser_color[x]
 
     wwiv_fg_bold = (x & 0x08) >> 3
     wwiv_fg_italics = (x & 0x80) >> 7
