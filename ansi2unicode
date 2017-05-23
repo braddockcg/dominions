@@ -72,10 +72,6 @@ def wwiv(ch):
     ansi = ansi_add(ansi, 30 + ansi_map[wwiv_fg])
     ansi = ansi_add(ansi, 40 + ansi_map[wwiv_bg])
 
-    #if x == 0x3e:  # Clear screen???
-    #    print("Clear Screen")
-    #    return '\x1b[2J\x1b[1;1H'
-
     if len(ansi) > 0:
         ansi += 'm'
     return ansi
@@ -95,6 +91,8 @@ while True:
     if wwiv_esc:
         wwiv_esc = False
         uni = wwiv(c[0])
+    elif c[0] == 0x0C:  # ^L Clear Screen
+        uni = '\x1b[2J\x1b[1;1H'
     else:
         uni = table.get(c[0], chr(c[0]))
     sys.stdout.write(uni)

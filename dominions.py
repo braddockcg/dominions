@@ -105,6 +105,15 @@ def dosemu(args):
     call(cmd)
 
 
+def dosemu_ansi(args):
+    dosemurc = os.path.join(get_source_dir(), 'dosemurc')
+    cmd = ['dosemu', '-dumb', '-f', dosemurc]
+    ansi2unicode = os.path.join(get_source_dir(), 'ansi2unicode')
+    cmd.extend(args)
+    cmd.extend(['|', ansi2unicode])
+    s = " ".join(cmd)
+    call(s, shell=True)
+
 
 def install_dom2(source):
     """Install Dominions ][.
@@ -168,7 +177,7 @@ def run_dom2(username, gamedb):
     chain['user_alias'] = username
     chain['user_real_name'] = username
     write_chain_file('CHAIN.TXT', chain)
-    dosemu(['DOMIN2.EXE'])
+    dosemu_ansi(['DOMIN2.EXE'])
 
 
 def run(username, gamedb):
@@ -178,7 +187,7 @@ def run(username, gamedb):
     chain['user_alias'] = username
     chain['user_real_name'] = username
     write_chain_file('CHAIN.TXT', chain)
-    dosemu(['DOMINION.EXE', 'CHAIN.TXT'])
+    dosemu_ansi(['DOMINION.EXE', 'CHAIN.TXT'])
 
 
 class GameDB(object):

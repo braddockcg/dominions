@@ -28,6 +28,8 @@ ADD DOM500.ZIP DOM500.ZIP
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
 ADD profile .profile
+ADD CP437.TXT CP437.TXT
+ADD ansi2unicode ansi2unicode
 
 # Uncomment one of the following lines to install 
 # the original Dominions or Dominions ][ (--dom2)
