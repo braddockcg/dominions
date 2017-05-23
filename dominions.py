@@ -163,30 +163,32 @@ def write_chain_file(fname, chain_data):
         f.write(chain_template.format(**data))
 
 
-def run_turns(gamedb):
+def run_turns(username, gamedb):
     now = datetime.utcnow()
     while now > gamedb.get_next_turn_timestamp():
-        dosemu(['DOMEVENT.EXE'])
+        if gamedb.is_version_1():
+            create_chain_file(username, gamedb)
+            dosemu(['MAINTAIN.EXE', 'CHAIN.TXT'])
+        else:
+            dosemu(['DOMEVENT.EXE'])
         gamedb.increment_turn_timestamp()
 
 
-def run_dom2(username, gamedb):
+def create_chain_file(username, gamedb):
     chain = {}
     u = gamedb.db['users'][username]
     chain['user_number'] = u['id']
     chain['user_alias'] = username
     chain['user_real_name'] = username
     write_chain_file('CHAIN.TXT', chain)
+
+def run_dom2(username, gamedb):
+    create_chain_file(username, gamedb)
     dosemu_ansi(['DOMIN2.EXE'])
 
 
 def run(username, gamedb):
-    chain = {}
-    u = gamedb.db['users'][username]
-    chain['user_number'] = u['id']
-    chain['user_alias'] = username
-    chain['user_real_name'] = username
-    write_chain_file('CHAIN.TXT', chain)
+    create_chain_file(username, gamedb)
     dosemu_ansi(['DOMINION.EXE', 'CHAIN.TXT'])
 
 
@@ -384,13 +386,12 @@ def main():
                     username = args.user
                 if not gamedb.db['initialized']:
                     initialize_game(gamedb)
-                if not gamedb.is_version_1():
-                    # Dominions 2 requires explicit running of the nightly maintenance,
-                    # the original dominions runs it automatically on user login
-                    run_turns(gamedb)
-                    run_dom2(username, gamedb)
-                else:
+                # Dominions requires explicit running of the nightly maintenance,
+                run_turns(username, gamedb)
+                if gamedb.is_version_1():
                     run(username, gamedb)
+                else:
+                    run_dom2(username, gamedb)
     except filelock.Timeout:
         print("Someone else is playing, try again later.")
 
