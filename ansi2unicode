@@ -12,6 +12,7 @@ import io
 import sys
 import os
 import re
+import codecs
 
 global source_dir
 abspath = os.path.abspath(__file__)
@@ -79,8 +80,10 @@ def wwiv(ch):
 
 table = read_codemap(os.path.join(get_source_dir(), 'CP437.TXT'))
 
-wwiv_esc = False
+# Set output encoding to UTF-8
+sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
+wwiv_esc = False
 while True:
     c = sys.stdin.buffer.read(1)
     if len(c) == 0:
