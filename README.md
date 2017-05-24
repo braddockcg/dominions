@@ -42,5 +42,33 @@ ssh -p2222 dominions@localhost
 # Default password is `conquest`
 ```
 
+### Setting the nightly maintenance time
+
+You probably want to set the time for nightly maintenance
+to midnight local time.  You set it by editing gamedir/gamedb.json
+
+First open a bash shell into your container:
+
+```bash
+docker exec -i -t dominions1 /bin/bash
+vim gamedir/gamedb.json
+```
+
+Then edit next\_turn\_timestamp, which is in UTC.  
+This example sets it to run at 7am UTC, which is midnight Pacific time.
+
+```json
+    "next_turn_timestamp": [
+        2017,
+        5,
+        24,
+        7,
+        0,
+        0,
+        2,
+        144,
+        0
+    ],
+```
 
 ---
