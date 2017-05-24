@@ -10,6 +10,11 @@ does not require a WWIV BBS installation.
 The `dominions.py` python command line interface provides a means to install a
 new game, process turns, or log in as a user and run the game.  
 
+`ansi2unicode` is a separate utility which converts ANSI graphics characters to
+their Unicode UTF-8 equivalents, which allows the games to be played without
+loading special VGA fonts or code tables.  It also interprets WWIV "heart code"
+color encodings into standard ANSI color codes.
+
 A Dockerfile is included for easily running an ssh game in a Docker container.
 
 ## The Two Dominions
