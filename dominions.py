@@ -6,6 +6,7 @@ import argparse
 import io
 import json
 import time
+from getpass import getpass
 from datetime import datetime, timedelta
 from subprocess import check_call
 import hashlib, binascii
@@ -370,11 +371,11 @@ def main():
                         if username == None:
                             print('Creating new user...')
                             username = input('New Username? ')
-                            password = input('New Password? ')
+                            password = getpass('New Password? ')
                             gamedb.add_user(username, password)
                             break
                         else:
-                            password = input("Password? ")
+                            password = getpass("Password? ")
                             correct = gamedb.verify_password(username, password)
                             if correct:
                                 break
