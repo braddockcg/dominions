@@ -69,7 +69,8 @@ def wwiv(ch):
 
     ansi = ''
     ansi = ansi_add(ansi, wwiv_fg_bold)
-    ansi = ansi_add(ansi, wwiv_fg_italics)
+    if wwiv_fg_italics:
+        ansi = ansi_add(ansi, 3)
     ansi = ansi_add(ansi, 30 + ansi_map[wwiv_fg])
     ansi = ansi_add(ansi, 40 + ansi_map[wwiv_bg])
 
@@ -96,6 +97,8 @@ while True:
         uni = wwiv(c[0])
     elif c[0] == 0x0C:  # ^L Clear Screen
         uni = '\x1b[2J\x1b[1;1H'
+    elif c[0] == 0x0D: # ^M/CR Clear to end of line
+        uni = '\x1b[K'
     else:
         uni = table.get(c[0], chr(c[0]))
     sys.stdout.write(uni)
