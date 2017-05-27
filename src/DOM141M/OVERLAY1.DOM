@@ -1,0 +1,325 @@
+{ for Dominions! version 1.41 - May 1989 }
+
+{--------========>*>*>*> Main Menu Procedures <*<*<*<========--------}
+
+   { All of the following procedures were called from the Main Menu.}
+
+   procedure Counterintelligence_Menu;
+
+      Begin
+         Repeat
+            writeln;
+            print ('Counterintelligence Menu');
+            print ('~~~~~~~~~~~~~~~~~~~~~~~~');
+            if not (Empire[Player_Number].Expert) then
+               Begin
+                  print ('Spy on an (E)mpire');
+                  print ('(H)elp');
+                  print ('Spy on a (P)lanet');
+                  print ('(Q)uit to Main Menu');
+                  writeln;
+               End;
+            if Empire[Player_Number].Expert
+               then prompt ('Option (E,H,P,Q) > ')
+               else prompt ('Option > ');
+            Onek (OneChar, 'EHPQX');
+            Case OneChar of
+               'E' : Spy_Empire;                      {Case of... Sends }
+               'H' : PrintFile ('HelpCoun.Dom');      {Program to Correct }
+               'P' : Spy_Planet;                      {Procedure for }
+               'Q' : Exit;                            {Counterintel. Input.}
+               'X' : Empire[Player_Number].Expert := not (Empire[Player_Number].Expert);
+            End;
+         Until IsFalse;
+      End;
+
+   procedure Empire_Menu;
+
+      Begin
+         Repeat
+            writeln;
+            print ('Empire Management Menu');
+            print ('~~~~~~~~~~~~~~~~~~~~~~');
+            if not (Empire[Player_Number].Expert) then
+               Begin
+                  print ('Make an (A)nnouncement');
+                  print ('(C)hange Empire''s Name');
+                  print ('(H)elp');
+                  print ('(L)ist Empires');
+                  print ('Send (M)essage to Another Player');
+                  print ('(Q)uit to Main Menu');
+                  print ('(S)tatus of the Empire');
+                  print ('Increase (T)echnology Level');
+                  writeln;
+               End;
+            if Empire[Player_Number].Expert
+               then prompt ('Option (A,C,H,L,M,Q,S,T) > ')
+               else prompt ('Option > ');
+            Onek (OneChar, 'ACHLMQSTX');
+            Case OneChar of
+               'A' : Announcement;
+               'C' : Change_Empire_Name;
+               'H' : PrintFile ('HelpEmpi.Dom');
+               'L' : List_Empires;
+               'M' : Message;
+               'Q' : Exit;
+               'S' : Print_Empire (Player_Number);
+               'T' : Increase_Technology;
+               'X' : Empire[Player_Number].Expert := not (Empire[Player_Number].Expert);
+            End;
+         Until IsFalse;
+      End;
+
+   procedure Maps;
+
+      Var
+         Map_File : Text;
+         Next_Line : String[42];
+         Which_Map : Integer;
+
+      Begin
+         writeln;
+         print ('  |~~~|~~~|~~~|~~~|~~~|   Each region is');
+         print ('  |   |   |   |   |   |   10 x 50 light');
+         print ('  |   |   |   |   |   |           years');
+         print ('  |   |   |   |   |   |');
+         print ('  | 1 | 2 | 3 | 4 | 5 |   Whole map is');
+         print ('  |   |   |   |   |   |   50 x 50 ly');
+         print ('  |   |   |   |   |   |');
+         print ('  |   |   |   |   |   |');
+         print ('  |___|___|___|___|___|');
+         writeln;
+         prompt ('Print which map region? ');
+         Onek (OneChar, '012345');
+         Val (OneChar, Which_Map, EC);
+         if EC <> 0 then Exit;
+         Case Which_Map of
+            0 : Exit;
+            1 : assign (Map_File, 'Region1.Dom');
+            2 : assign (Map_File, 'Region2.Dom');
+            3 : assign (Map_File, 'Region3.Dom');
+            4 : assign (Map_File, 'Region4.Dom');
+            5 : assign (Map_File, 'Region5.Dom');
+         End;
+         Reset (Map_File);
+            Repeat
+               readln (Map_File, Next_Line);
+               print (Next_Line);
+               if Keypressed then
+                  Begin
+                     Close (Map_File);
+                     Exit;
+                  End;
+            Until EOF(Map_File);
+         close (Map_File);
+         writeln;
+         PauseScr;
+      End;
+
+   procedure Navy_Menu;
+
+      Begin
+         Repeat
+            writeln;
+            print ('Navy Management Menu');
+            print ('~~~~~~~~~~~~~~~~~~~~');
+            if not Empire[Player_Number].Expert then
+               Begin
+                  print ('(B)uild New Ships');
+		  print ('(I)nstall New Radars');
+                  print ('(C)ompute Distance Between Planets');
+                  print ('(H)elp');
+                  print ('(M)ove Ships');
+                  print ('(Q)uit to Main Menu');
+                  print ('(S)tatus of the Navy');
+                  print ('(E)xamine Radars');
+                  print ('(P)lanetary Status');
+                  writeln;
+               End;
+            if Empire[Player_Number].Expert
+               then prompt ('Option (B,I,C,H,M,Q,S,E,P) > ')
+               else prompt ('Option > ');
+            Onek (OneChar, 'BICHMSEPQX');
+            Case OneChar of
+               'B' : Build_Ships;
+               'I' : Build_Radar;
+               'C' : Compute_Distance;
+               'H' : PrintFile ('HelpNava.Dom');
+               'M' : Move_Ships;
+               'Q' : Exit;
+               'S' : Navy_Status;
+               'E' : Examine_Radar;
+               'P' : planet_status;
+               'X' : Empire[Player_Number].Expert := not Empire[Player_Number].Expert;
+            End;
+         Until IsFalse;
+      End;
+
+   procedure Planet_Menu;
+
+      Begin
+         Repeat
+            writeln;
+            print ('Planet Management Menu');
+            print ('~~~~~~~~~~~~~~~~~~~~~~');
+            if not Empire[Player_Number].Expert then
+               Begin
+                  print ('Set Manpower Allocations for (A)ll');
+                  print ('   Planets');
+                  print ('(C)hange the Name of a Planet');
+                  print ('(H)elp');
+                  print ('Increase (I)ndustry Level of a Planet');
+                  print ('(L)ist All Planets');
+                  print ('Change (M)anpower Allocation of a');
+                  print ('   Planet');
+                  print ('(Q)uit to Main Menu');
+                  print ('(S)tatus of a Planet');
+                  print ('(Z)oom View Planets');
+                  writeln;
+               End;
+            if Empire[Player_Number].Expert
+               then prompt ('Option (A,C,H,I,L,M,Q,S,Z) > ')
+               else prompt ('Option > ');
+            Onek (OneChar, 'ACHILMQSXZ');
+            Case OneChar of
+               'A' : All_Manpower;
+               'C' : Change_Planet_Name;
+               'H' : PrintFile ('HelpPlan.Dom');
+               'I' : Increase_Industry;
+               'L' : List_Planets;
+               'M' : Change_Manpower;
+               'Q' : Exit;
+               'S' : Planet_Status;
+               'X' : Empire[Player_Number].Expert := not Empire[Player_Number].Expert;
+               'Z' : Zoom_View;
+            End;
+         Until IsFalse;
+      End;
+
+   procedure Read_Recent_Happenings;
+
+      Var
+         Recent_Happenings : Text;
+         Next_Line : String80;
+
+      Begin
+         writeln;
+         print ('(T)his month''s, (L)ast month''s,');
+         prompt ('or (B)oth ? ');
+         Onek (OneChar, 'BLT');
+         cls;
+         if (OneChar = 'L') or (OneChar = 'B') then
+            Begin
+               assign (Recent_Happenings, 'Yesterda.Dom');
+               reset (Recent_Happenings);
+               While not EOF(Recent_Happenings) do
+                  Begin
+                     readln (Recent_Happenings, Next_Line);
+                     print (Next_Line);
+                     if Keypressed then
+                        Begin
+                           Close (Recent_Happenings);
+                           Exit;
+                        End;
+                  End;
+               close (Recent_Happenings);
+               PauseScr;
+            End;
+         if (OneChar = 'T') or (OneChar = 'B') then
+            Begin
+               assign (Recent_Happenings, 'Today.Dom');
+               reset (Recent_Happenings);
+               While not EOF(Recent_Happenings) do
+                  Begin
+                     readln (Recent_Happenings, Next_Line);
+                     print (Next_Line);
+                     if KeyPressed then
+                        Begin
+                           Close (Recent_Happenings);
+                           Exit;
+                        End;
+                  End;
+               close (Recent_Happenings);
+               PauseScr;
+            End;
+      End;
+
+procedure Scores;
+
+  Var
+   LoopS : Byte;
+
+  Begin
+    print ('Scoring');
+    Empire[Player_Number].Points := Score (Player_Number);
+    for LoopS := 1 to 20 do
+    print(addrear(addfront(St(LoopS),2),5)+addrear(Empire[LoopS].Empire_Name,25)+addfront(St(Empire[LoopS].Points),25));
+    if Keypressed then Exit;
+    PauseScr;
+  End;
+
+{ -=*=*=*=*=> Make New Player is called from Load_Information <=*=*=*=*=- }
+
+   procedure Make_New_Player (What_Slot : Integer);
+
+      Var
+         Name_of_Empire : String25;
+         Name_of_HomeWorld : String20;
+
+      Begin
+         clrscr;
+         cls;
+         Ansic (6);
+         print ('Welcome New Warlord!');
+         writeln;
+         Ansic (0);
+         prompt ('Are you sure you want to play Dominions! ? ');
+         if not YN then Halt;
+         writeln;
+         with Empire[What_Slot] do
+            Begin
+               User_Number := UserNum;
+               User_Name := ThisUser.Name;
+               Radars[1] := 0;
+               Radars[2] := 0;
+               Radars[3] := 0;
+               Repeat
+                  writeln;
+                  print ('Enter the name of your Empire');
+                  prompt ('>');
+                  InputL (BigString, 25);
+                  Empire_Name := BigString;
+               Until Empire_Name > '';
+            End;
+         Repeat
+            writeln;
+            print ('Enter the name of your Homeworld');
+            prompt ('>');
+            InputL (BigString, 20);
+            Planet[What_Slot].Planet_Name := BigString;
+         Until Planet[What_Slot].Planet_Name > '';
+         Player_Number := What_Slot;
+         prompt ('Your Empire is number ');
+         Ansic(4);
+         print (St(Player_Number));
+         Ansic (0);
+         writeln;
+         PauseScr;
+         clrscr;
+         cls;
+         writeln;
+         print ('Please read the Instructions before playing Dominions!');
+         print ('This will help you greatly and save you a lot of grief.');
+         print ('All Menus have (H)elp commands if you need it.');
+         writeln;
+         print ('Also, it is VERY neccessary to line capture or print the');
+         print ('Maps of the Galaxy (command M from the Main Menu) if you');
+         print ('wish to play effectively.  Some SysOps may place the map');
+         print ('files in the download area to make it easier for you.');
+         writeln;
+         Ansic (4);
+         print ('Thank you for playing Dominions!');
+         Ansic (0);
+         writeln;
+         PauseScr;
+      End;

@@ -1,0 +1,50 @@
+This file contains the description of features I have added to Version
+1.41. The features are:
+
+      - Radar Stations
+      - Squadron Reports
+      - additions to reports
+
+				Siroos Afshar
+------------------------------------------------------------------------
+
+
+1 - RADAR STATIONS
+  A player can build and install ONE radar station in each one of his/her
+  planets. The player can then "Examine" the radar screen(s) via a (new)
+  command, (E)xamine Radars, in the Navy Management menu. If an enemy
+  squadron is on its way to attack a planet in which a radar station is
+  installed, and if the squadron is within the range of the radar, a
+  report describing the squadron is printed as a response to "Examine
+  Radars" command.
+
+  There are 3 classes of radar stations:
+
+   Class	Range		industry units		Technology Level
+	   (in light years)	    needed 		    required
+--------------------------------------------------------------------------
+short range       4                 100                        5
+mid range         8                 300                        12
+long range        12                700                        20
+--------------------------------------------------------------------------
+
+
+   A player can install a longer range radar station in a planet which 
+   already has a (shorter range) station; but the shorter range radar
+   will be dismantled (no net increase in the total number of radar
+   stations as reported in the "Empire Status").
+
+   If a player captures another player's planet the radar station installed
+   in the captured planet by its ex-ownoer, if any, will be destroyed during
+   the fight.
+
+
+2 - STATUS OF SQUADRONS SENT
+   The "Status" command in the Navy Management menu now prints the status
+   of all of the player's squadrons in the move.  The status includes
+   destination planet, speed, distance still left, and the counts of
+   ships in the squadron.
+
+3 - ADDITIONS TO REPORTS 
+   The planet status report and the empire status report now include
+   radar stations installed.

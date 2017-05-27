@@ -1,0 +1,417 @@
+  Instructions for Dominions! (v1.40+)
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+--------------------------------------
+For instructions on Radar Stations and
+Squadron Reports see file ADD_ON.DOC
+--------------------------------------
+
+   I. The History of the Empire
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  (excerpts from The Complete Imperial
+   History, (C) 2998 by the Imperial
+   University at Amalthea.)
+
+    2750 : It was the Age of Happiness.
+The Galactic Empire,  now almost  three
+hundred  years  old,  controlled  every
+habitable world  in  the  galaxy.   The
+Imperial Capital  at New Earth  (planet
+21) was  the greatest  megopolis  ever.
+The  Imperial  University  at  Amalthea
+brought  together  the  most  brilliant
+minds  in history  for the  benefit  of
+mankind.   There had  been no  wars for
+almost  seven   decades.   The  massive
+Dreadnoughts of the Empire insured that
+peace would last forever.
+    But  that  was   two-hundred  fifty
+years ago.  In the year 2842, the Great
+Plague  struck  at  the  heart  of  the
+Empire.     Trillions   died.    Entire
+planets were left lifeless after only a
+year.  Emperor Koligar IV  himself fell
+victim,  leaving his  three nephews  to
+vie for the throne.  What was to follow
+was the most destructive war the galaxy
+had ever known.
+    The    youngest   nephew,   Rjakar,
+quickly had his  older brother Chiriton
+assassinated and then  declared himself
+Emperor.  Bayan, the third nephew,  who
+had been exiled from  New Earth in 2839
+for  political reasons,  raised a  navy
+from   his   supportive  homeworld   of
+Trantor,  and with the  help of several
+admirals in the Imperial Navy, attacked
+New  Earth  in  2844.   By  taking  key
+planets close to the capital, Bayan was
+able to isolate New Earth from the rest
+of  the galaxy.   Rjakar held  out  for
+five  years.  In 2849,  Bayan  launched
+his  final assault  against his cousin.
+New  Earth   was   pillaged,  and   the
+Imperial Palace  was razed after Rjakar
+was captured.  He was  swiftly executed
+by Bayan's own hand.
+    The  seven  years of  civil war had
+destroyed  the structure of the Empire.
+The  plague  had   annihilated  several
+worlds.   Fear  of  the  plague led  to
+widespread  xenophobia.   Communication
+among  worlds was rare.  Space pirates,
+almost  eliminated  two  hundred  years
+earlier,  reappeared  overnight.   With
+the Imperial Navy  committed to the war
+at New Earth, and a  galactic famine in
+progress, piracy  was the only way, for
+many, to  survive.   Bayan's consolida-
+tion of power in 2851,  along with  the
+discovery of a  cure for the  plague in
+2852,  brought together  almost half of
+the former  Imperial Worlds.  But Bayan
+had  no   interest  in   attempting  to
+reinstate control  over the  devastated
+outer regions  of the  galaxy.  Slowly,
+but surely,  the bacchanalian lifestyle
+of  Bayan and  his court  corrupted the
+remnants   of   the   Galactic  Empire.
+Trantor became a Sybarite's paradise as
+the new capital of the Empire.  Bayan's
+descendants  retained  control  of  the
+Empire for seventy-five years after his
+death  in 2861,  with the  decay of the
+Empire growing throughout.
+    A revolt  by Admiral Veqan  of Aeci
+Alpha  ended  the rule  of Trantor  and
+Bayan's kin,  returning the  capital to
+New  Earth.    Veqan's  rule   saw  the
+rebuilding of  New Earth  and the first
+expansion  of  the  Empire   since  the
+Imperial Civil War.  But his mysterious
+death  in 2942,  after only  six  years
+in  power,  ended  all  possibility  of
+Imperial reconstruction.
+    For the past fifty-seven years, the
+Emperorship  has  been  passed  to  and
+stolen  by  numerous  admirals  of  the
+Imperial Navy.  The Galactic Empire now
+consists  of only  New Earth (still the
+capital) and the  stronghold worlds  of
+Amalthea,   Trantor,   Magrathea,   and
+Terminus   (planets  22   through   25,
+respectively).
+
+   II. The Rise of the Second Empire
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    You  are  one  of  twenty  powerful
+warlords.    Each  of  you   has  risen
+through  the  ranks  of  power  on your
+homeworld.    Now,  the  time  for  the
+construction  of  the  Second  Galactic
+Empire  has come.  Using military force
+(backed with  economic force)  you must
+build  the  foundations   for  the  new
+empire.
+    But the  old Empire  still controls
+the strongest worlds  in the galaxy and
+you must  battle with  the remnants  of
+the Imperial Navy to capture them.
+    Somewhere in the galaxy is the lost
+planet  of  Earth,  the  birthplace  of
+mankind.      The    extremely     high
+habitability  of Earth  will  allow the
+population to grow rapidly, providing a
+much needed  workforce for  the warlord
+who can capture it.
+
+   III. How to Play
+   ~~~~~~~~~~~~~~~~
+    Dominions! is an  easy-to-use, menu
+driven program.  Each menu has a (H)elp
+function   which  will   describe   the
+available  commands  (it  is  for  this
+reason that the individual descriptions
+of the commands have  been omitted here
+in the instructions).
+    The  game "universe"  consists of a
+galaxy of two hundred planets.  The map
+of the galaxy is  split into 5 sections
+which  may be  viewed  using  the (M)ap
+option in the Main Menu.
+    One game month  equals one day real
+time.
+    Every day,  the first  time  a user
+plays   Dominions!,   the   Maintenence
+program  will run.   The  program  will
+update  the planets  and  all ships  in
+transit.
+
+    A. The Object
+    ~~~~~~~~~~~~~
+    The  object  of  Dominions!  is  to
+conquer  everything  you can,  no holds
+barred.   Your  planets   will  produce
+goods which can then  either be applied
+to  the manufacture of  warships or  to
+the  increasing  of  your  shipbuilding
+ability.
+    This is primarily  a war game.  All
+strategy involved  in the game revolves
+around   basic   warfare   theory.   If
+you're a pacifist,  this game isn't for
+you.
+    Be  forewarned  -   Offense   isn't
+everything.  Don't  leave  key  planets
+undefended.  Your  neighbors aren't the
+nicest of people.
+
+    B. The Menus
+    ~~~~~~~~~~~~
+    Main Menu : From here  you move  to
+specialty sub-menus.
+
+    Counterintelligence  Menu  :   This
+menu  controls  your  spying  on  other
+planets or empires (players).
+
+    Empire Menu : Controls the economic
+and political functions of the empire.
+
+    Naval Menu : Controls  the  actions
+of all ships in your navy.
+
+    Planet Menu : Allows you to control
+the economic and political functions of
+all the planets you own.
+
+    Every menu allow you to  toggle the
+e(X)pert mode on and off,  although the
+command is actually  only listed in the
+Main Menu.  When the eXpert mode is on,
+the full menu will not be shown, only a
+one line prompt will be given...
+
+    Dominions! Main Menu
+    ~~~~~~~~~~~~~~~~~~~~
+    Option (C,E,H,I,M,N,P,Q,R,S,X) >
+
+    C. Getting Started
+    ~~~~~~~~~~~~~~~~~~
+    When you first play in a given war,
+the computer  will set  up a new Empire
+for you.   You will  be asked  to  name
+your empire  and your  homeworld.   The
+planet  number of  your capital  is the
+same  as  your  empire number.   Up  to
+twenty players  may participate in each
+war.
+    Each   player   starts   with   the
+following...
+
+    Technology Level 1.0
+    40 Frigates
+    10 Destroyers
+    10 Industry Units
+     4 Technology Units
+
+    A homeworld with
+    15,000 population
+    75 % Habitability rating
+    Industry Level 1.0
+
+    D. Planets
+    ~~~~~~~~~~
+    The known galaxy is  made up of 200
+habitable planets that you can conquer.
+Each    has    its    own    individual
+characteristics.    Below  is   how  an
+average planet report looks...
+
+    Planet Number : 57
+    Planet Name : Apoc's World of Doom
+    Owner : 11
+    X,Y : 38,19
+    Habitability : 63 %
+    Population : 51,459
+    Industry Level : 1.7
+    Defenses :
+       Frigates : 46
+       Destroyers : 17
+       Cruisers : 4
+       Battleships : 1
+       Dreadnoughts : 0
+       SuperDreadnoughts : 0
+
+    Habitability  is a  relative rating
+of  the  planet's  compatibility   with
+human    life.     The    greater   the
+habitability,  the faster  the planet's
+population will  grow.  The formula for
+population  growth   of  OWNED  planets
+is...
+
+ New Pop = Old Pop * (1.05+(Hab/1000))
+
+    for an UNowned planet, the formula
+is...
+
+ New Pop = Old Pop * (1.05+(Hab/2000))
+
+    Planets  with  high  habitabilities
+will  end  up   with  populations  MUCH
+greater than those of low hab planets.
+
+    E. Empires
+    ~~~~~~~~~~
+    Each player rules an Empire.   Your
+Empire consists of  all the planets and
+ships you own.  There will  be nineteen
+other     empires    opposing    yours.
+Alliances  don't  do  very  much  good,
+because the nature  of the game is such
+that it is highly individualistic.
+
+    F. Economics
+    ~~~~~~~~~~~~
+    Economics in Dominions!  are fairly
+simple.    People   are   the   key  to
+manufacturing  everything.    The  more
+people in  your empire, the  more ships
+you can make.
+    There are  two basic  commodities :
+Technology Units  and  Industry  Units.
+Technology Units are  used to  increase
+the  Technology Level  of  your Empire.
+Industry Units have two functions; they
+can be used to  manufacture warships or
+to increase  the Industrial Level  of a
+planet.
+    Production for  the two commodities
+is different.  It takes 2500 workers to
+produce  1 Technology  Unit,  but  only
+1000  workers to make  1 Industry Unit.
+    Planetary labor  percentages are by
+population.   If  you  have 50%  of the
+population  in  Industry,  half of  the
+planet's   population   will   work  in
+Industry.    Half   of   the   planet's
+production will NOT  be Industry Units.
+    A planet's  production is  modified
+by the Industry Level of a planet.
+    The formula for production is...
+
+Ind. Units = Population / 1000 * Square
+             Root of Industry Level
+
+Tech. Units = Pop / 2500 * Square Root
+              of Industry Level
+
+     G. Ships
+     ~~~~~~~~
+     Maintaining  a   strong  navy   is
+absolutely  essential  to   winning  in
+Dominions!.   To build  ships, it takes
+Industry Units.  However,  if you never
+increase  your  Technology  Level,  you
+will  soon discover  that your  smaller
+ships are  greatly  outclassed  by your
+opponent's  large  ships.    A  balance
+between the size and number of ships is
+necessary.   The following  is chart of
+the Technology Level and Industry Units
+needed to make each ship class...
+
+Ship Class     Tech. Level  Ind. Units
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Frigate            1.0           5
+Destroyer          2.0          10
+Cruiser            3.5          20
+Battleships        5.5          40
+Dreadnought        9.0          80
+SuperDreadnought  15.0         160
+
+     Next is  a chart  of  each  ship's
+characteristics...
+
+Ship   Damage Done on    Damage
+Class  Offense/Defense  Takeable  Speed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fr       1- 2    2- 3       5       3
+Ds       2- 4    3- 6      11       3
+Cr       4- 8    6-12      24       4
+Bs       8-12   12-24      53       5
+Dn      12-24   24-48     116       5
+SDn     24-48   48-96     255       4
+
+    Damage Done on...  tells  how  many
+structural  points of damage  the given
+class of  ship can  cause per  round of
+battle.
+    Damage Takeable  is the  amount  of
+structural  points  the ship  can  take
+before being destroyed.
+    Speed is the number  of light years
+(ly) the  ship  will  travel  per  game
+month.
+    Don't send just  one large  ship to
+capture a  planet.   Even if  the enemy
+has only  one Frigate  he will  win the
+battle  using suicide  tactics.  Always
+support your  larger ships with smaller
+ones.
+
+    H. Spying
+    ~~~~~~~~~
+    All spying is  controlled  from the
+Counterintelligence  Menu.  You can get
+up to TEN  spy reports  per game month.
+But, they  aren't  cumulative.   If you
+don't use them,  they're lost  when the
+Maintenence program runs.
+    You can use your spy reports to spy
+on  either planets  or  enemy  empires.
+You  will  be   given  almost  all  the
+information on  that subject, including
+populations,   Tech/Ind   Levels,   and
+planet habitabilies.
+
+    I. The Galactic Empire and Earth
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The Galactic Empire  still controls
+five very  powerful planets.  New Earth
+(planet 21)  is  defended  by  a  large
+navy.  The other four Imperial planets,
+Amalthea,   Trantor,   Magrathea,   and
+Terminus   (planets   22   through  25,
+respectively)  are gaurded  by smaller,
+but still  powerful navies.   Capturing
+any of these worlds  will  give a major
+advantage to the player that can do it.
+    Somewhere in the galaxy is the lost
+planet of origin of mankind, Earth.  It
+possesses a large population and a 100%
+habitabilty,  yet is  defended  by only
+about a dozen  frigates.  It is  a very
+valuable planet, and is on par with the
+power of the Imperial planets.
+
+    J. Other Stuff
+    ~~~~~~~~~~~~~~
+    If  you have  comments, criticisms,
+or   suggestions,   you  can  reach  me
+through Dominions' home board...
+
+    Pandemonium (WWIVnet 9951)
+    (919) 768-6354
+    Winston-Salem, NC
+
+    Leave mail to Apocalypse, User 15.
+
+    Thanks, and I hope you enjoy the
+game!
+
+    Apocalyse
+    WWIVnet ID 15 @ 9951
+    GEnie Mail Address C.HAISTY
+    CompuServe ID 72220,3000

@@ -1,0 +1,23 @@
+
+Naval Help
+~~~~~~~~~~
+[B]uild New Ships : Spends Industrial
+   Units to build the ships of your
+   choice (assuming you have the needed
+   Technology level).
+
+[C]ompute Distance Between Planets :
+   Computes the distance (in light
+   years) between two planets.
+
+[M]ove Ships : Moves ships from one
+   planet to another.  If you own the
+   destination planet the ships will
+   arrive as reinforcements.  If you
+   do not own the planet, your ships
+   will engage in combat with the
+   defenses of the target planet.
+
+[S]tatus of the Navy : Shows how many
+   ships you have and where they are.
+

@@ -1,0 +1,281 @@
+                 System Operator/Programmer Documentation
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      _________                   for
+     |_   ___  \
+       | |   \  \   ___  __  __  __  __   __  __  ___  __   __   ___
+       | |    \  \ / _ \|  \/  ||  ||  \ |  ||  |/ _ \|  \ |  | /  _>
+       | |    /  // / \ \||\/||  ||  ||\\ ||  ||/ / \ \||\\ ||  \ <
+      _| |___/  / \ \_/ /||  ||  ||  || \\||  ||\ \_/ /|| \\||  _> \
+     |_________/   \___/|__||__||__||__| \__||__|\___/|__| \__|<___/
+     ****************************************************************
+                      The Race for Galactic Domination
+
+                   By Apocalypse of StrangeMode Software
+                                Version 1.41
+                                  May 1989
+
+     Special thanks to The Catt, Mr. Bill, and the Pandemonium Playtesters
+
+
+     I. Running Dominions!
+     ~~~~~~~~~~~~~~~~~~~~~
+     Dominions! runs in about 85k of RAM, about 50k of which is
+used by variable data and 35k for the actual program.
+
+     To run Dominions!, just do two things...
+
+  FIRST...
+
+     In DOS, run the program RESET.COM
+
+     C>RESET
+
+     The reset program will create the data files needed to run
+dominions.
+
+  SECOND, make sure you have all of the following
+files in the same path directory...
+
+     Program Source files
+     ~~~~~~~~~~~~~~~~~~~~
+     DOMINION.COM
+     DOMINION.000
+
+
+     Data files (created by RESET.COM)
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     EMPIRES.DOM
+     PLANETS.DOM
+     SQUADS.DOM
+     MESSAGES.DOM
+     DATE.DOM
+     LASTON.DOM
+     REGION1.DOM
+     REGION2.DOM
+     REGION3.DOM
+     REGION4.DOM
+     REGION5.DOM
+
+     Text files
+     ~~~~~~~~~~
+     HELPCOUN.DOM
+     HELPEMPI.DOM
+     HELPNAVA.DOM
+     HELPPLAN.DOM
+     HELPMAIN.DOM
+     INSTRUCT.DOM
+     PICTURE.DOM
+
+
+     II. The RESET program
+     ~~~~~~~~~~~~~~~~~~~~~
+     The Reset program (RESET.COM) does the task of erasing and initializing
+the Dominions! data files.
+     There are two times when you would want to run the reset program.  The
+first is when you're initially setting up Dominions!  The second is when
+"the war" is over.  I highly suggest that you allow the game to run for a
+predetermined time (4 weeks suggested), and then reset the data files and
+start over.  Declare whoever had the most points at the time of the reset as
+the Winner, or Emperor or whatever title you think is deserved.  Then go
+post the final scores in message, to let everyone see how they did.
+      You don't have to do this, but it's probably wiser and more fun than
+letting the same war go on forever.  After a few months the numbers will
+become to large for the maintenence program to handle, and it will fail to
+run properly (it will return a Run-Time error 91, I believe).
+     Also, I suggest that you place the "REGION_".DOM files in the download
+area so that your game players can have easy and quick access to them.
+
+
+     III. The MAINTENENCE program
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     The Maintenence program (MAINTAIN.DOM) updates all the players and
+their squadrons when the first person plays the game each day.  It shouldn't
+take it too long to run, no more than maybe a minute, maximum.
+     If you take the BBS down for the day for repairs, etc., don't worry,
+the maintenence program won't run for the day because no one played it.
+If no one plays for two days, two day's worth of maintenence will not be done,
+only one day's worth.
+
+
+     IV. Dominions! Files
+     ~~~~~~~~~~~~~~~~~~~~
+     Dom140A.ZIP (version 1.40A) was PKZIPed with PKZIP version 0.92.
+     The following files are included in the Zip file...
+
+     Dominion.Com       Main program
+     Dominion.Pas       Main program source code
+     Reset.Com          Reset program
+     Reset.Pas          Reset program source code
+     Maintain.Dom       Maintenence program source code
+     Overlay1.Dom       1st generation procedure source code
+     Overlay2.Dom       2nd generation procedure source code
+     Overlay3.Dom       3rd generation procedure source code
+     Instruct.Dom       Intructions text file
+     HelpMain.Dom       Main menu help file
+     HelpCoun.Dom       Counterintelligence menu help file
+     HelpEmpi.Dom       Empire menu help file
+     HelpNava.Dom       Naval menu help file
+     HelpPlan.Dom       Planet menu help file
+     Picture.Dom        Opening screen text file
+     Sysopdoc.Dom       This text file
+
+     Author's NOTE : In actuality, only OVERLAY2.DOM is a Turbo Pascal
+                     overlay file.  I didn't overlay the other two
+                     OVERLAY files because I didn't need to.
+
+     V. Sharing Dominions!
+     ~~~~~~~~~~~~~~~~~~~~~
+     You are free to copy and distrubite Dominions and it's subprograms
+as long as the following conditions are met...
+
+     1) No fee or purchase cost is charged.
+     2) Any modifications made are noted in the Sysopdoc.Dom file by the
+        person making the modifications with the date and nature of the
+        modifications.
+     3) All programs listed in Section IV are included in the archive.
+
+     VI. Modifications and Bug Fixes
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     1.41 - The "Run-Time Error 04" Bug has been fixed.  No longer will a
+negative value of ships be forced upon a planet when an unerased array value
+takes "extra" ships off of a planet.  Thanks to The Dubber for deciphering
+this bug!
+
+      1.40A - The following modifications were made by Tarl Cabot, sysop of
+Ko Ro Ba.  Thanx Tarl!
+
+     In the NAVY move routines, the player is prompted for how many ships to
+send, there was no check for any type of negative input.  This has been
+corrected now.  Players could SEND negative fleets, and since a negative
+subtracted from 0 (or any positive value) gives a positive result, the fleets
+on the planets were growing very rapidly!  This single oversight had a very
+detrimental effect on the data files - it would lock up the game at maintenance
+time.  Not too pretty.
+
+     Once more in the NAVY routines, the calculation for the ship costs
+involved a REAL, a BYTE and an INTEGER, with the BYTE and INTEGER being
+multiplied against one another.  This would not yield the expected real value
+that was expected, instead it produced an INTEGER value and would flip at the
+integer limit.  This caused the fleets that were being bought to be 'sold',
+'built', whatever, at a greatly reduced value.  Imagine being able to build
+Superdreadnoughts at about 2.6 points apiece!  Granted, you'd have to be 'rich'
+enough to have the points to attempt the building of the 9999 ships to create
+the integer flip, but once there, you'd be able to increase your fleets
+DRASTICALLY!  I inserted a temporary REAL variable to cover these calculations
+and all it fine with the universe again...
+
+     The INTMUCH variable in the planet industrial increase routine would
+suffer an integer overflow if too great a value was entered and crash the
+program.  I changed it to a real variable from the integer setting it was
+defined as.
+
+     In the save_all routine, the date is re-called and saved this to the file
+set, even though the player may have entered at 11:59 pm, and the new date
+would be the next day when the player was finished playing.  Maintenance
+wouldn't run in this event.  I deleted the call for the date in that routine,
+and made the Date_now variable a global so to allow the initial reading be the
+same value that is written to disk...so far no problems with the maintenance
+routine not being run...
+
+     In the maintenance routines for production, I added parenthesis to the
+percentage calculation that the player had for Tech and Ind, the other way
+(without the parenthesis) the amount produced for both were lower than they
+should have been.  I also added the square root function (sqrt) to the
+calculation to make the formula in the documentation the same as what is used
+in the game.
+
+     In the OVERLAY3.DOM file, you have a function, RoundOff, I deleted
+all the fancy string manipulation and insert the FRAC function, you'll get a
+true roundoff for the calculations that utilize the roundoff function you've
+created.  I deleted the first three lines of the procedure, the string[12]
+variable, and then inserted P := FRAC(RON); and went from there...works like a
+champ!
+
+     I've also altered the St function to remove the call to the Pad routine,
+and inserted StA:=StA - frac(StA) to eliminate that bothersome single unit of
+tech or industry that would creep into play.
+
+     I've also removed all references the Pad and Back_Pad routines, and
+substituted my own string padding routines; Addfront and Addrear.  These allow
+the programmer to follow the code a little better, and it also affords the
+displays to be created a little cleaner and more uniform.
+
+     I've added a display for the percent habitability in the planet Zoom
+display for the planets.  Also added a call to the Planet Status display in the
+Navy routines.
+
+     That wraps up the features and changes in this version of this very
+exciting game.  I would like to thank the Author for distributing the source
+with this game so that others, such as myself, can dabble with it and make the
+sum total a better product.  I would also like to thank the gamers of my
+system, since I wouldn't have been able to track most of these bugs down
+without them.  Especially one of my users, Mysterion.  He seems to find
+EVERYTHING that has been overlooked in the coding.
+
+                                       - Tarl Cabot
+
+     VII. Legal Stuff
+     ~~~~~~~~~~~~~~~
+     The author of Dominions! assumes no responsibilty for any failure of
+the program (or subprograms) to perform in the indicated or expressed way,
+and/or any damage caused by the failure of the program.  Use Dominons!
+at your own risk!
+
+
+      VII. Other Previously Unmentioned Stuff 
+      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     Earlier versions of Dominions! were written on an IBM XT clone with
+1 meg RAM, a 20 megabyte hard disk, and only a measly 8 mhz operating speed.
+This version was done on an real IBM XT with 1 meg RAM and 12 mhz.
+All versions were written in Turbo Pascal 3.0.
+
+     The source code files (DOMINION.PAS, RESET.PAS, OVERLAY...) aren't
+really needed to run Dominions!, I just included them for those of you who
+are curious about the source code.
+
+     The Dominions! source code isn't as "clean" as it could be, as I learned
+quite a bit while writing his game and I haven't yet gone back to trim
+the "rough edges".
+
+     Dominions! 2.00 should be entering Beta Testing in a few weeks and
+should be available in July.
+
+     There is a special account set-up specifically for downloading and
+feedback concerning Dominions! on Pandemonium (919) 768-6354.  It is
+
+     StrangeMode, User # 12
+     Password : STRANGE
+     Phone # : 9999
+
+     This account will give you access to the Dominions! download area
+and to send Feedback (which will be forwarded to me by The Catt).  This
+will allow you to get the most recent version of Dominions! without
+having to have a personal account.
+
+     If you have any suggestions, comments, or criticisms of Dominions!,
+please leave a message for me anyway you can.  The home board of Dominions!
+(Pandemonium) does have WWIVnet connections for mail and messages.
+
+     In addition, there is now a WWIVnet sub devoted to Dominions! support
+for both Sysops and players.  It is net sub 9959.  Send EMail to 1 @ 9951 to
+subscribe.
+
+If all else fails, call
+
+     Pandemonium (WWIVnet 9951)
+     (919) 768-6354
+     Winston-Salem, NC
+
+     and leave your comments in the validation message or leave mail to
+
+     #15, Apocalyse
+
+     Thanks, and I hope you enjoy Dominions!
+
+     =>Apocalypse<= (aka Chris Haisty)
+     WWIVnet ID 15 @ 9951
+     GEnie mail address C.HAISTY
+     CompuServe ID 72220,3300
+
+     P.S. Hi Rowen! (AE Forever)
+

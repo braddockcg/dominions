@@ -1,0 +1,342 @@
+{ for Dominions! version 1.41 - May 1989 }
+
+{+!+!+!+!+!+!+!+!+!+!+ Maintenance Procedures  +!+!+!+!+!+!+!+!+!+!+!+!+}
+
+procedure Production;
+
+  Var
+    LoopPro, Owner_Temp : Integer;
+
+  Begin
+    print ('Producing goods');
+    for LoopPro := 1 to Number_of_Planets do
+    if (Planet[LoopPro].Owner > 0) and (Planet[LoopPro].Owner < Number_of_Players) then
+      Begin
+        Owner_Temp := Planet[LoopPro].Owner;
+        Empire[Owner_Temp].Industry_Units :=
+           Empire[Owner_Temp].Industry_Units + RoundOff (Planet[LoopPro].Population / 1000 *
+           (Planet[LoopPro].Industry_Percent / 100) * sqrt(Planet[LoopPro].Industrial_Level));
+        Empire[Owner_Temp].Technology_Units :=
+           Empire[Owner_Temp].Technology_Units + RoundOff (Planet[LoopPro].Population / 2500 *
+           (Planet[LoopPro].Technology_Percent / 100) * sqrt(Planet[LoopPro].Industrial_Level));
+      End;
+  End;
+
+
+procedure Reproduce;
+
+  Var
+   LoopRep : Integer;
+
+  Begin
+    print ('Increasing populations');
+    for LoopRep := 1 to Number_of_Planets do
+      Begin
+        if (Planet[LoopRep].Owner > 0) and (Planet[LoopRep].Owner <= Number_of_Players) then
+           Planet[LoopRep].Population := RoundOff (Planet[LoopRep].Population *
+           (Planet[LoopRep].Habitability / 1000 + 1.05));
+        if (Planet[LoopRep].Owner = 0) or (Planet[LoopRep].Owner = 21) then
+           Planet[LoopRep].Population := RoundOff (Planet[LoopRep].Population *
+           (Planet[LoopRep].Habitability / 2000 + 1.05));
+     End;
+  End;
+
+procedure Change_Date;
+
+  Var
+   NewDate_File : File of Integer;
+
+  Begin
+    print ('Changing Date');
+    CurMonth := CurMonth + 1;
+    if CurMonth = 13 then
+      Begin
+        Year := Year + 1;
+        CurMonth := 1;
+      End;
+  End;
+
+procedure Change_Happenings;
+
+  Var
+   Happenings_File : Text;
+
+  Begin
+    print ('Updating Happenings');
+    assign (Happenings_File, 'Yesterda.Dom');
+    Erase (Happenings_File);
+    Add_On (' ');
+    assign (Happenings_File, 'Today.Dom');
+    Rename (Happenings_File, 'Yesterda.Dom');
+    assign (Happenings_File, 'Today.Dom');
+    rewrite (Happenings_File);
+    write (Happenings_File, Month[CurMonth],' ',Year, ^M, ^J);
+    write (Happenings_File, '~~~~~~~~~~~~~', ^M, ^J);
+    close (Happenings_File);
+  End;
+
+procedure Determine_Losses (Attack_Damage,Defense_Damage,LoopMS,Destination : Integer);
+
+  Var
+   LoopDL, Which_Lost, Total_Ships : Integer;
+
+  Begin
+    Repeat
+     with Squadron[LoopMS] do
+      Total_Ships := Ships[1]+Ships[2]+Ships[3]+Ships[4]+Ships[5]+Ships[6];
+     Which_Lost := Random(Total_Ships) + 1;
+     with Squadron[LoopMS] do
+       Begin
+         if Which_Lost <= Ships[1] then Which_Lost := 1;
+         if (Which_Lost>Ships[1]) and (Which_Lost<=Ships[1]+Ships[2]) then Which_Lost := 2;
+         Total_Ships := Ships[1] + Ships[2];
+         for LoopDL := 3 to 6 do
+           Begin
+             if (Which_Lost>Total_Ships) and (Which_Lost<=Total_Ships+Ships[LoopDL]) then
+               Which_Lost := LoopDL;
+             Total_Ships := Total_Ships + Ships[LoopDL];
+           End;
+       End;
+     Squadron[LoopMS].Ships[Which_Lost] := Squadron[LoopMS].Ships[Which_Lost]-1;
+     Defense_Damage := Defense_Damage - Ship_Damage[Which_Lost];
+     if (Squadron[LoopMS].Ships[1] = 0) and (Squadron[LoopMS].Ships[2] = 0)
+        and (Squadron[LoopMS].Ships[3] = 0) and (Squadron[LoopMS].Ships[4] = 0)
+        and (Squadron[LoopMS].Ships[5] = 0) and (Squadron[LoopMS].Ships[6] = 0)
+        then Defense_Damage := 0
+    Until Defense_Damage < 1;
+
+    Repeat
+     with Planet[Destination] do
+      Total_Ships := Ships[1]+Ships[2]+Ships[3]+Ships[4]+Ships[5]+Ships[6];
+     Which_Lost := Random(Total_Ships) + 1;
+     with Planet[Destination] do
+      Begin
+        if Which_Lost <= Ships[1] then Which_Lost := 1;
+        if (Which_Lost>Ships[1]) and (Which_Lost<=Ships[1]+Ships[2]) then Which_Lost := 2;
+        Total_Ships := Ships[1] + Ships[2];
+        for LoopDL := 3 to 6 do
+          Begin
+            if (Which_Lost>Total_Ships) and (Which_Lost<=Total_Ships+Ships[LoopDL]) then
+              Which_Lost := LoopDL;
+            Total_Ships := Total_Ships + Ships[LoopDL];
+          End;
+      End;
+     Planet[Destination].Ships[Which_Lost] := Planet[Destination].Ships[Which_Lost] - 1;
+     Attack_Damage := Attack_Damage - Ship_Damage[Which_Lost];
+     if (Planet[Destination].Ships[1] = 0) and (Planet[Destination].Ships[2] = 0)
+        and (Planet[Destination].Ships[3] = 0) and (Planet[Destination].Ships[4] = 0)
+        and (Planet[Destination].Ships[5] = 0) and (Planet[Destination].Ships[6] = 0)
+        then Attack_Damage := 0;
+    Until Attack_Damage < 1;
+  End;
+
+ procedure New_Owner (Which_Planet, Owner, ExOwner : Integer);
+
+   Var
+    LoopNO : Integer;
+
+   Begin
+     if Planet[Which_Planet].Radars[1] <> 0 then
+	Empire[ExOwner].Radars[1] := Empire[ExOwner].Radars[1] - 1;
+     Planet[Which_Planet].Radars[1] := 0;
+
+     if Planet[Which_Planet].Radars[2] <> 0 then
+	Empire[ExOwner].Radars[2] := Empire[ExOwner].Radars[2] - 1;
+     Planet[Which_Planet].Radars[2] := 0;
+
+     if Planet[Which_Planet].Radars[3] <> 0 then
+	Empire[ExOwner].Radars[3] := Empire[ExOwner].Radars[3] - 1;
+     Planet[Which_Planet].Radars[3] := 0;
+     
+     LoopNO := 0;
+     Repeat
+      LoopNO := LoopNO + 1;
+     Until (Messages[LoopNO].Sent_To = 0) or (LoopNO <= Number_of_Messages);
+     LoopNO := 0;
+     Repeat
+      LoopNO := LoopNO + 1;
+     Until (Messages[LoopNO].Sent_To = 0) or (LoopNO <= Number_of_Messages);
+     if LoopNO <= Number_of_Messages then
+       with Messages[LoopNO] do
+         Begin
+           Sent_By := 0;
+           Sent_To := ExOwner;
+           Message := 'Planet ' + St(Which_Planet) + ' was taken by ' +
+           Empire[Owner].Empire_Name + ' [' + St(Owner) + '].';
+         End;
+   End;
+
+procedure Fight (Owner, LoopMS, Destination : Integer);
+
+  Var
+   Attack_Damage, Defense_Damage, LoopF, LoopRF, ExOwner, Winner : Integer;
+
+  Begin
+    Repeat
+      Attack_Damage := 0;
+      Defense_Damage := 0;
+      Winner := 0;
+      for LoopRF := 1 to Number_of_Ships do
+      if Squadron[LoopMS].Ships[LoopRF] > 0 then
+        for LoopF := 1 to Squadron[LoopMS].Ships[LoopRF] do
+          Attack_Damage := Attack_Damage + Random(Ship_Attack[LoopRF]+1)+Ship_Attack[LoopRF];
+      for LoopRF := 1 to Number_of_Ships do
+        if Planet[Destination].Ships[LoopRF] > 0 then
+          for LoopF := 1 to Planet[Destination].Ships[LoopRF] do
+            Defense_Damage := Defense_Damage + Random(Ship_Defense[LoopRF]+1)+Ship_Defense[LoopRF];
+      if (Planet[Destination].Ships[1] = 0) and (Planet[Destination].Ships[2] = 0)
+         and (Planet[Destination].Ships[3] = 0) and (Planet[Destination].Ships[4] = 0)
+         and (Planet[Destination].Ships[5] = 0) and (Planet[Destination].Ships[6] = 0)
+         then Winner := Owner;
+      if Winner=0 then Determine_Losses(Attack_Damage,Defense_Damage,LoopMS,Destination);
+      if (Planet[Destination].Ships[1] = 0) and (Planet[Destination].Ships[2] = 0)
+         and (Planet[Destination].Ships[3] = 0) and (Planet[Destination].Ships[4] = 0)
+         and (Planet[Destination].Ships[5] = 0) and (Planet[Destination].Ships[6] = 0)
+         then Winner := Owner;
+      if (Squadron[LoopMS].Ships[1] = 0) and (Squadron[LoopMS].Ships[2] = 0)
+         and (Squadron[LoopMS].Ships[3] = 0) and (Squadron[LoopMS].Ships[4] = 0)
+         and (Squadron[LoopMS].Ships[5] = 0) and (Squadron[LoopMS].Ships[6] = 0)
+         then Winner := Destination;
+    Until Winner > 0;
+    if Winner = Destination then
+      Begin
+        if (Planet[Destination].Owner > 0) and (Planet[Destination].Owner < 21) then
+         Send_Message (0,Planet[Destination].Owner,Empire[Owner].Empire_Name+' attacked planet '+St(Destination));
+        Send_Message (0,Owner,'You were defeated at planet '+St(Destination));
+        Add_On (Empire[Owner].Empire_Name + ' was defeated at planet ' + St(Destination));
+      End;
+    if Winner = Owner then
+      Begin
+        if (Planet[Destination].Owner > 0) and (Planet[Destination].Owner < 21) then
+          Send_Message (0,Planet[Destination].Owner,Empire[Owner].Empire_Name+
+          ' captured planet '+St(Destination));
+        ExOwner := Planet[Destination].Owner;
+        Planet[Destination].Owner := Owner;
+        New_Owner (Destination, Owner, ExOwner);
+        Send_Message (0,Owner,'You captured planet ' +St(Destination) + '!');
+        Add_On (Empire[Owner].Empire_Name+' captured planet '+St(Destination) + '!');
+      End;
+  End;
+
+procedure Add_Ships(LoopMS, Destination : Integer);
+
+  Var
+   LoopAS : Integer;
+
+  Begin
+    for LoopAS := 1 to Number_of_Ships do
+      Planet[Destination].Ships[LoopAS]:=Planet[Destination].Ships[LoopAS]+Squadron[LoopMS].Ships[LoopAS];
+  End;
+
+procedure Update_Empire_Stats;
+
+  Var
+   LoopTES, LoopTES2, LoopTJ : Integer;
+
+  Begin
+    print ('Update Empires');
+    for LoopTES := 1 to Number_of_Players do
+      Begin
+        Empire[LoopTES].Total_Population := 0;
+        Empire[LoopTES].Planets := 0;
+        for LoopTJ := 1 to 6 do
+        Empire[LoopTES].Ships[LoopTJ] := 0;
+        Empire[LoopTES].Intel_Reports := 10;
+        for LoopTES2 := 1 to 600 do
+          with Squadron[LoopTES2] do
+            Begin
+              if Owner = LoopTES then
+                for LoopTJ := 1 to 6 do
+                   Empire[LoopTES].Ships[LoopTJ]:=Empire[LoopTES].Ships[LoopTJ]+Ships[LoopTJ];
+            End;
+        for LoopTES2 := 1 to Number_of_Planets do
+          Begin
+            if Planet[LoopTES2].Owner = LoopTES then
+              Begin
+                Empire[LoopTES].Total_Population := Empire[LoopTES].Total_Population
+                 +Planet[LoopTES2].Population;
+                Empire[LoopTES].Planets := Empire[LoopTES].Planets + 1;
+                for LoopTJ := 1 to 6 do
+                  Empire[LoopTES].Ships[LoopTJ] := Empire[LoopTES].Ships[LoopTJ]
+                   +Planet[LoopTES2].Ships[LoopTJ];
+              End;
+          End;
+      End;
+  End;
+
+procedure Total_Scores;
+
+  Var
+   LoopTS : Integer;
+
+  Begin
+    print ('Scoring');
+    for LoopTS := 1 to Number_of_Players do
+     Empire[LoopTS].Points := Score (LoopTS);
+  End;
+
+procedure Erase_Squadron (LoopMS : Integer);     {Bug fix for 1.41}
+
+   Var
+      LoopES : Byte;
+
+   Begin
+      with Squadron[LoopMS] do
+         Begin
+            Owner := 0;
+            Destination := 0;
+            Distance_Left := 0;
+            Speed := 0;
+            for LoopES := 1 to Number_of_Ships do
+               Ships[LoopES] := 0;
+         End;
+   End;
+
+procedure Arrived (Owner, LoopMS, Destination : Integer);
+
+  Var LoopARR : Integer;
+
+  Begin
+    if Planet[Destination].Owner <> Owner then Fight(Owner, LoopMS, Destination);
+    if Planet[Destination].Owner = Owner then Add_Ships(LoopMS, Destination);
+    Erase_Squadron(LoopMS);
+    for LoopARR := 1 to Number_of_Ships do
+      Squadron[LoopMS].Ships[LoopARR] := 0;
+  End;
+
+procedure Move_Squads;
+
+  Var
+   LoopMS : Integer;
+
+  Begin
+    print ('Moving Squadrons');
+    for LoopMS := 1 to Number_of_Squads do
+       with Squadron[LoopMS] do
+         if Owner > 0 then
+           Begin
+             Distance_Left := Distance_Left - Speed;
+             if Distance_Left <= 0 then Arrived(Owner, LoopMS, Destination);
+           End;
+  End;
+
+procedure Maintenence;
+
+  Begin
+    clrscr;
+    cls;
+    writeln;
+    print ('Maintenance Program is now running...');
+    print ('Simply amazing what we''re willing to');
+    print ('do for you users.');
+    writeln;
+    Production;
+    Reproduce;
+    Change_Date;
+    Change_Happenings;
+    Move_Squads;
+    Update_Empire_Stats;
+    Total_Scores;
+    writeln;
+    print ('All done!');
+  End;

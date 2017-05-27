@@ -1,0 +1,204 @@
+{ for Dominions! version 1.30A - March 1989 }
+
+{ *!*!*!*!* The following procedures are called from more than one procedure.
+  The procedures from which they are called are listed after the procedure's
+  name is declared. *!*!*!*!*!* }
+
+   function Check_Planets : Boolean;
+
+      Begin
+         Check_Planets := true;
+         if Empire[Player_Number].Planets <= 0 then
+            Begin
+               print ('You have no planets!');
+               Check_Planets := false;
+            End;
+      End;
+
+function RoundOff (RON : Real) : Real;
+
+  Var
+   P : Real;
+
+  Begin
+    p:=frac(ron);
+    if P < 0.5 then RoundOff := RON - P;
+    if P >= 0.5 then RoundOff := RON + 1 - P;
+  End;
+
+   function Score (Which_Empire : Integer) : Real;
+
+      { = Called from Maintenence & Scores & Save_All = }
+
+      Var
+         LoopSC : Byte;
+         Temp_Score : Real;
+
+      Begin
+         with Empire[Which_Empire] do
+            Begin
+               Temp_Score := Total_Population + Ships[1] * 100 +
+                  Ships[2] * 200 + Ships[3] * 400 + Ships[4] * 800 +
+                     Ships[5] * 1600 + Ships[6] * 3200;
+               for LoopSC := 1 to Planets do
+                  Temp_Score := Temp_Score + 30000;
+            End;
+         Score := Temp_Score;
+      End;
+
+   procedure Print_Empire (Which_Empire : Byte);
+
+      { -= Called from Spy_Empire & Empire_Menu =- }
+
+      Var
+         LoopPE : Byte;
+
+      Begin
+         clrscr;
+         writeln;
+         print ('Empire Number : ' + St(Which_Empire));
+         print ('Name : ' + Empire[Which_Empire].Empire_Name);
+         print ('Planets : ' + St(Empire[Which_Empire].Planets));
+         print ('Technology Level : ' + StReal(Empire[Which_Empire].Technology_Level,1));
+         print ('Total Population : ' + St(Empire[Which_Empire].Total_Population));
+         print ('Industry Units : ' + St(Empire[Which_Empire].Industry_Units));
+         print ('Technology Units : ' + St(Empire[Which_Empire].Technology_Units));
+         if Player_Number = Which_Empire then
+            print ('Intelligence Actions Left : ' + St(Empire[Which_Empire].Intel_Reports));
+         print ('Ships :');
+         for LoopPE := 1 to Number_of_Ships do
+            print ('   ' + Ship_Name[LoopPE] + ' : ' + St(Empire[Which_Empire].Ships[LoopPe]));
+         writeln;
+         if Empire[Which_Empire].Radars[1] > 0 then
+           print ( St(Empire[Which_Empire].Radars[1]) 
+                  + ' short range radar(s) installed.' );
+         if Empire[Which_Empire].Radars[2] > 0 then
+           print ( St(Empire[Which_Empire].Radars[2]) 
+                  + ' mid range radar(s) installed.' );
+         if Empire[Which_Empire].Radars[3] > 0 then
+           print ( St(Empire[Which_Empire].Radars[3]) 
+                  + ' long range radar(s) installed.' );
+         writeln;
+         PauseScr;
+      End;
+
+   procedure Print_Planet (Which_Planet : Byte);
+
+      { -= Called from Spy_Planet & Planet_Menu =- }
+
+      Var
+         LoopPP : Byte;
+
+      Begin
+         clrscr;
+         writeln;
+         print ('Planet Number : ' + St(Which_Planet));
+         print ('Name : ' + Planet[Which_Planet].Planet_Name);
+         if Planet[Which_Planet].Owner <> Player_Number then
+            print ('Owner : ' + St(Planet[Which_Planet].Owner));
+         print ('Location [X,Y] : ' + St(Planet[Which_Planet].X) + ',' +
+            St(Planet[Which_Planet].Y));
+         print ('Population : ' + St(Planet[Which_Planet].Population));
+         print ('Habitability : ' + St(Planet[Which_Planet].Habitability) + ' %');
+         print ('Industrial Level : ' + StReal(Planet[Which_Planet].Industrial_Level,2));
+         if Planet[Which_Planet].Owner = Player_Number then
+            Begin
+               print ('Work Allocation :');
+               print ('   Industry : ' + St(Planet[Which_Planet].Industry_Percent) + ' %');
+               print ('   Technology : ' + St(Planet[Which_Planet].Technology_Percent) + ' %');
+            End;
+         print ('Defenses :');
+         for LoopPP := 1 to Number_of_Ships do
+            print ('   ' + Ship_Name[LoopPP] + 's : ' + St(PLanet[Which_Planet].Ships[LoopPP]));
+
+         if Planet[Which_Planet].Radars[1] = 1 then
+            print ( 'A short range radar installed' );
+         if Planet[Which_Planet].Radars[2] = 1 then
+            print ( 'A mid range radar installed' );
+         if Planet[Which_Planet].Radars[3] = 1 then
+            print ( 'A long range radar installed' );
+         
+         writeln;
+         PauseScr;
+      End;
+
+   procedure List_Empires;
+
+      { -= Called from Spy_Empire =- }
+
+      Var
+         LoopLE : Byte;
+
+      Begin
+         for LoopLE := 1 to Number_of_Players do
+            Begin
+               prompt (addfront(St(LoopLE),2) + '  ');
+               if Empire[LoopLE].User_Number = 0 then print ('Unowned');
+               if Empire[LoopLE].User_Number <> 0 then print (Empire[LoopLE].Empire_Name);
+               if Keypressed then Exit;
+            End;
+         PauseScr;
+      End;
+
+   procedure List_Planets;
+
+      { -= Called from Spy_Planet & Planet Menu =- }
+
+      Var
+         LoopLP : Byte;
+
+      Begin
+         writeln;
+         for LoopLP := 1 to Number_of_Planets do
+            Begin
+               prompt (addfront(St(LoopLP),3) + '     ');
+               if Planet[LoopLP].Owner > 0
+                  then write (addrear(Planet[LoopLP].Planet_Name,20))
+                   else
+                    prompt ('                    ');
+               Ansic (1);
+               print (addfront(St(Planet[LoopLP].Owner),5));
+               if Keypressed then
+                  Begin
+                     prompt ('Abort Listing ? ');
+                     if YN then Exit;
+                  End;
+               if (LoopLP / 20) = Int(LoopLP /20) then
+                  PauseScr;
+            End;
+      End;
+
+   procedure Add_On (Article : String160);
+
+      Var
+         Recent_Happenings : Text;
+
+      Begin
+         Assign (Recent_Happenings, 'Today.Dom');
+         Append (Recent_Happenings);
+         writeln (Recent_Happenings, Article);
+         close (Recent_Happenings);
+      End;
+
+   procedure Send_Message (From, To_Whom : Integer; Msg : String160);
+
+      Var
+         LoopSM : Byte;
+
+      Begin
+         LoopSM := 0;
+         Repeat
+            LoopSM := LoopSM + 1;
+            if LoopSM > Number_of_Messages then
+               Begin
+                  print ('>All Message Records are Filled<');
+                  Exit;
+               End;
+         Until (Messages[LoopSM].Sent_To = 0);
+         with Messages[LoopSM] do
+            Begin
+               Sent_By := From;
+               Sent_To := To_Whom;
+               Message := Msg;
+            End;
+      End;

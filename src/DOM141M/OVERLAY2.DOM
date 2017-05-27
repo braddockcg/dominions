@@ -1,0 +1,789 @@
+{ for Dominions! version 1.41 - May 1989 }
+
+{ -----=======>*>*> Counterintelligence Menu Procedures <*<*<======------ }
+
+   { All of the following procedures are called from the Counterintelligence }
+   { Menu.}
+
+   overlay procedure Spy_Empire;
+
+      Var
+         Spy_Empire_Number : Integer;
+
+      Begin
+         if Empire[Player_Number].Intel_Reports = 0 then
+            Begin
+               print ('You can not spy anymore this month.');
+               Exit;
+            End;
+         Repeat                          {Repeats Until the Player no longer }
+            writeln;                     {wants to see the List.}
+            prompt ('Spy on Which Empire (? for List) > ');
+            InputL (BigString, 2);
+            if BigString = '?' then List_Empires;
+         Until BigString <> '?';
+         Spy_Empire_Number := 0;
+         Val (BigString, Spy_Empire_Number, EC);
+         if (Spy_Empire_Number <= 0) or (EC <> 0) then Exit;
+         if Spy_Empire_Number = Player_Number then
+            Begin
+               print ('You''re empire ' + St(Player_Number) + '!');
+               Exit;
+            End;
+         if (Spy_Empire_Number > 0) and (Spy_Empire_Number <= Number_of_Players) then
+            Begin
+               Print_Empire (Spy_Empire_Number);
+               Empire[Player_Number].Intel_Reports := Empire[Player_Number].Intel_Reports - 1;
+            End;
+      End;
+
+   overlay procedure Spy_Planet;
+
+      Var
+         Spy_Planet_Number : Integer;
+
+      Begin
+         if Empire[Player_Number].Intel_Reports = 0 then
+            Begin
+               print ('You can not spy anymore this month.');
+               Exit;
+            End;
+         Repeat
+            writeln;
+            prompt ('Spy on Which Planet (? for List) > ');
+            InputL (BigString, 3);
+            if BigString = '?' then List_Planets;
+         Until BigString <> '?';
+         Spy_Planet_Number := 0;
+         Val (BigString, Spy_Planet_Number, EC);
+         if (Spy_Planet_Number <= 0) or (EC <> 0) then Exit;
+         if Planet[Spy_Planet_Number].Owner = Player_Number then
+            print ('You own planet ' + St(Spy_Planet_Number) + '!');
+         if (Spy_Planet_Number > 0) and (Spy_Planet_Number <=
+            Number_of_Planets) and (Planet[Spy_Planet_Number].Owner <>
+               Player_Number) then
+                  Begin
+                     Print_Planet (Spy_Planet_Number);
+                     Empire[Player_Number].Intel_Reports := Empire[Player_Number].Intel_Reports - 1;
+                  End;
+      End;
+
+{ -----=======>*>*> Empire Management Menu Procedures <*<*<======------ }
+
+   { All of the following procedures were called from the Empire
+     Management Menu.}
+
+   overlay procedure Announcement;
+
+      Var
+         Recent_Happenings : Text;
+
+      Begin
+         writeln;
+         print ('Enter Announcement (Up to 75 characters).  Hit <Return> to abort.');
+         prompt ('>');
+         InputL (BigString, 75);
+         if BigString = '' then
+            Begin
+               print ('Aborted');
+               Exit;
+            End;
+         Add_On ('==> ' + Empire[Player_Number].Empire_Name +
+            ' made an announcement...');
+         Add_On (BigString);
+         print ('Announcement Saved');
+      End;
+
+   overlay procedure Change_Empire_Name;
+
+      Begin
+         writeln;
+         print ('Input New Empire Name (25 Characters Max)');
+         prompt ('>');
+         InputL (BigString, 25);
+         if BigString = '' then
+            Begin
+               print ('Aborted.');
+               Exit;
+            End;
+         Add_On (Empire[Player_Number].Empire_Name + ' changed it''s name to ' +
+            BigString);
+         Empire[Player_Number].Empire_Name := BigString;
+         print ('New Empire name is ' + Empire[Player_Number].Empire_Name);
+      End;
+
+   overlay procedure Message;
+
+      Var
+         Send_To_Whom : Integer;
+         Send_To_Valid : Boolean;
+
+      Begin
+         Repeat
+            Send_To_Valid := false;
+            prompt ('Send Message to what Empire? ');
+            Input (BigString, 2);
+            if BigString = '' then Exit;
+            Val (BigString, Send_To_Whom, EC);
+            if EC <> 0 then Exit;
+            if (Send_To_Whom = 0) or (Send_To_Whom = Player_Number) then Exit;
+            if (Send_To_Whom > 0) and (Send_To_Whom <= Number_of_Players)
+               and (Empire[Player_Number].User_Number > 0)
+                  then Send_To_Valid := true;
+         Until Send_To_Valid;
+         print ('Enter Message (Up to 75 Characters).  Type <Return> to abort.');
+         prompt ('>');
+         InputL (BigString, 75);
+         if BigString = '' then
+            Begin
+               print ('Aborted.');
+               Exit;
+            End;
+         Send_Message (Player_Number, Send_To_Whom, BigString);
+      End;
+
+   overlay procedure Increase_Technology;
+
+      Var
+         IntIncrease : Integer;
+         Increase : Real;
+
+      Begin
+         print ('You have ' + St(Empire[Player_Number].Technology_Units) + ' technology units.');
+         print ('Each .1 increase costs 5 technology units.');
+         prompt ('Increase Technology Level by how much? ');
+         InputL (BigString, 3);
+         Val (BigString, Increase, EC);
+         if BigString = '' then Exit;
+         If EC <> 0 then Exit;
+         if Increase < 0.1 then Exit;
+         Increase := Increase * 10;               {Rounds to the nearest }
+         IntIncrease := round (Increase);         {tenth.}
+         Increase := IntIncrease / 10;
+         if Increase * 50 > Empire[Player_Number].Technology_Units then
+            print ('Not enough Technology Units available');
+         if (Increase * 50) <= Empire[Player_Number].Technology_Units then
+            Begin
+               Empire[Player_Number].Technology_Level := Empire[Player_Number].Technology_Level + Increase;
+               Empire[Player_Number].Technology_Units := Empire[Player_Number].Technology_Units - round (Increase * 50);
+               print ('Technology Level is now ' + StReal(Empire[Player_Number].Technology_Level,1));
+            End;
+      End;
+
+{--------========>*>*> Navy Menu Procedures <*<*<=========--------}
+
+   { All of the following procedures were called from the Navy Management
+     Menu.}
+
+   overlay procedure Build_Ships;
+
+      Var
+         Building_Options : String[8];
+         Which_Ship,
+         Place_Where,
+         H, How_Many      : Integer;
+         temp             : real;
+         Can_Build        : Boolean;
+
+      Begin
+         Building_Options := '0';
+         writeln;
+         if not Check_Planets then Exit;
+         Can_Build := false;
+         for h := 1 to Number_of_Ships do
+            Begin
+               if Ship_Tech[H] <= Empire[Player_Number].Technology_Level then
+                  Begin
+                     print ('(' + St(H) + ') ' + Ship_Name[H]);
+                     Building_Options := Building_Options + St(H);
+                  End;
+            End;
+         writeln;
+         prompt ('Build which kind of ship? ');
+         Onek (OneChar, Building_Options);
+         Val (OneChar, Which_Ship, EC);
+         if EC <> 0 then Exit;
+         if Which_Ship = 0 then Exit;
+         writeln;
+         print (St(Empire[Player_Number].Industry_Units) + ' Industry Units available.');
+         print ('Each ' + Ship_Name[Which_Ship] + ' costs ' + St(Ship_Cost[Which_Ship]) +
+            ' Industry Units.');
+         prompt ('Build how many ' + Ship_Name[Which_Ship] + 's? ');
+         InputL (BigString, 4);
+         if BigString = '' then Exit;
+         Val (BigString, How_Many, EC);
+         if EC <> 0 then Exit;
+         if How_Many < 1 then Exit;
+         if (How_Many + Empire[Player_Number].Ships[Which_Ship]) > 32700 then
+            Begin
+               print ('Your war computers can not control that many ' +
+                  Ship_Name[Which_Ship] + 's at one time');
+               Exit;
+            End;
+         temp:=How_many;
+         if (temp * Ship_Cost[Which_Ship]) > Empire[Player_Number].Industry_Units
+            then
+               print ('Not enough Industry Units available for production.');
+         if (temp * Ship_Cost[Which_Ship]) <= Empire[Player_Number].Industry_Units
+            then
+               Begin
+                  writeln;
+                  prompt ('Put Ships on what Planet? ');
+                  InputL (BigString, 3);
+                  Val (BigString, Place_Where, EC);
+                  if EC <> 0 then Exit;
+                  if (Place_Where <= 0) or (Place_Where > Number_of_Planets)
+                     or (BigString = '') then
+                        Begin
+                           print ('Aborted.');
+                           Exit;
+                        End;
+                  if (Place_Where <= Number_of_Planets) and
+                     (Planet[Place_Where].Owner = Player_Number)
+                     then
+                        Begin
+                           Planet[Place_Where].Ships[Which_Ship] := Planet[Place_Where].Ships[Which_Ship] +
+                              How_Many;
+                           Empire[Player_Number].Ships[Which_Ship] := Empire[Player_Number].Ships[Which_Ship] +
+                              How_Many;
+                           Empire[Player_Number].Industry_Units := Empire[Player_Number].Industry_Units -
+                              temp * Ship_Cost[Which_Ship];
+                           print (St(How_Many) + ' ' + Ship_Name[Which_Ship] + '(s) built on planet ' +
+                              St(Place_Where) + '.');
+                        End;
+                  if Planet[Place_Where].Owner <> Player_Number then
+                     print  ('You do not own that planet!');
+                  writeln;
+               End;
+      End;
+
+
+{----------SKA Begin-------}
+
+   overlay procedure Build_Radar;
+
+      Var
+         Building_Options : String[8];
+         Which_Radar,
+         Place_Where,
+         H,
+         flag          : Integer;
+
+      Begin
+         flag := 0;
+         Building_Options := '0';
+         writeln;
+         if not Check_Planets then Exit;
+         for H := 1 to Number_of_Radars do
+            Begin
+               if Radar_Tech[H] <= Empire[Player_Number].Technology_Level then
+                  Begin
+                     print ('(' + St(H) + ') ' + Radar_Name[H]);
+                     Building_Options := Building_Options + St(H);
+                     flag := 1;
+                  End;
+            End;
+         if flag = 0 then
+         Begin
+		print ( 'Your technology level is too low to build radars!' );
+                Exit;
+         End;
+         writeln;
+         prompt ('Build which kind of radar? ');
+         Onek (OneChar, Building_Options);
+         Val (OneChar, Which_Radar, EC);
+         if EC <> 0 then Exit;
+         if Which_Radar = 0 then Exit;
+         writeln;
+         print (St(Empire[Player_Number].Industry_Units) + ' Industry Units available.');
+         print ('A ' + Radar_Name[Which_Radar] + ' radar costs ' + St(Radar_Cost[Which_Radar]) +
+            ' Industry Units.');
+	 prompt ('Do you want to install radar?' );
+	 if YN then
+         begin
+         if (Radar_Cost[Which_Radar]) > Empire[Player_Number].Industry_Units
+            then
+               print ('Not enough Industry Units available for production.');
+         if (Radar_Cost[Which_Radar]) <= Empire[Player_Number].Industry_Units
+            then
+               Begin
+                  writeln;
+                  prompt ('Put Radar on what Planet? ');
+                  InputL (BigString, 3);
+                  Val (BigString, Place_Where, EC);
+                  if EC <> 0 then Exit;
+                  if (Place_Where <= 0) or (Place_Where > Number_of_Planets)
+                     or (BigString = '') then
+                        Begin
+                           print ('Aborted.');
+                           Exit;
+                        End;
+
+                  if (Place_Where <= Number_of_Planets) and
+                     (Planet[Place_Where].Owner = Player_Number)
+                     then Begin
+                  	   flag := 0;
+                           for H := Which_Radar to 3 do
+		             if (Planet[Place_Where].Radars[H] = 1 ) then
+	                     Begin
+                              print ( 'You already have the same or a better');
+                              print ( ' class of radar installed.');
+                              flag := 1;
+                             End;
+
+                           for H := 1 to (Which_Radar - 1) do
+		             if (Planet[Place_Where].Radars[H] = 1 ) then
+	                     Begin
+                              print ( 'Your existing '
+                                     + Radar_Name[H]
+                                     + ' radar will be replaced.' );
+                              Planet[Place_Where].Radars[H] := 0;
+                              Empire[Player_Number].Radars[H] :=
+                                  Empire[Player_Number].Radars[H] - 1;
+                             End;
+
+                           if flag = 0 then
+                           Begin
+                              Planet[Place_Where].Radars[Which_Radar] := 1;
+                              Empire[Player_Number].Radars[Which_Radar] :=
+                                  Empire[Player_Number].Radars[Which_Radar] + 1;
+                              Empire[Player_Number].Industry_Units :=
+                                  Empire[Player_Number].Industry_Units
+                                  - Radar_Cost[Which_Radar];
+                              print ( 'A '+ Radar_Name[Which_Radar]
+                                  +' radar installed on planet '
+                                  + St(Place_Where) + '.');
+                            End;
+                     End;
+                  if Planet[Place_Where].Owner <> Player_Number then
+                     print  ('You do not own that planet!');
+                  writeln;
+               End;
+          End; 
+      End;
+
+{-------------SKA End---------------}
+   overlay procedure Compute_Distance;
+
+      Var
+         Planet1, Planet2 : Integer;
+         Distance : Real;
+
+      Begin
+         Repeat
+            writeln;
+            prompt ('Compute distance from planet ');
+            InputL (BigString, 3);
+            Planet1 := 0;
+            Val (BigString, Planet1, EC);
+            if (Planet1 <= 0) or (EC <> 0) then Exit;
+         Until (Planet1 > 0) and (Planet1 <= Number_of_Planets);
+         Repeat
+            prompt ('to planet ');
+            InputL (BigString, 3);
+            Val (BigString, Planet2, EC);
+            if (Planet2 <= 0) or (EC <> 0) then Exit;
+         Until (Planet2 > 0) and (Planet2 <= Number_of_Planets);
+         Distance := Sqrt(Sqr(Planet[Planet1].X - Planet[Planet2].X) +
+            Sqr(Planet[Planet1].Y - Planet[Planet2].Y));
+         writeln;
+         print ('The distance is ' + StReal(Distance,2) + ' light years.');
+      End;
+
+   overlay procedure Move_Ships;
+
+      Var
+         From_Where, To_Where, Temp_Owner, How_Many, LoopMS, LoopMS2 : Integer;
+
+      Begin
+         writeln;
+         if not Check_Planets then Exit;
+         LoopMS := 0;
+         Repeat
+            LoopMS := LoopMS + 1;
+         Until (Squadron[LoopMS].Destination = 0) or (LoopMS > Number_of_Squads);
+         if LoopMS > Number_of_Squads then
+            Begin
+               print ('>All squadron data records are full<');
+               Exit;
+            End;
+         Repeat
+            Repeat
+               prompt ('Move ships From what planet? ');
+               InputL (BigString, 3);
+               if BigString = '' then Exit;
+               Val (BigString, From_Where, EC);
+               if EC <> 0 then Exit;
+               if From_Where = 0 then Exit;
+            Until (From_Where > 0) and (From_Where <= Number_of_Planets);
+         Until Planet[From_Where].Owner = Player_Number;
+         Repeat
+            prompt ('Send ships To what planet? ');
+            InputL (BigString, 3);
+            Val (BigString, To_Where, EC);
+            if (EC <> 0) then Exit;
+         Until (To_Where > 0) and (To_Where <= Number_of_Planets);
+         Temp_Owner := Planet[To_Where].Owner;
+         if (To_Where <= Number_of_Players) and (Empire[Temp_Owner].User_Number = 0) then
+            Begin
+               print ('You can''t attack unowned Home planets.');
+               Exit;
+            End;
+         for LoopMS2 := 1 to Number_of_Ships do
+            if Planet[From_Where].Ships[LoopMS2] > 0 then
+               Begin
+                  Repeat
+                     prompt ('Send how many ' + Ship_Name[LoopMS2] + 's [Up to '
+                        + St(Planet[From_Where].Ships[LoopMS2]) + '] ? ');
+                     InputL (BigString, 5);
+                     Val (BigString, How_Many, EC);
+                     if EC <> 0 then How_Many := 0;
+                     if BigString = '' then How_Many := 0;
+                     if how_many < 1 then how_many := 0;
+                     if How_Many > Planet[From_Where].Ships[LoopMS2] then
+                        print  ('You don''t have that many!');
+                  Until (How_Many <= Planet[From_Where].Ships[LoopMS2]);
+                  Squadron[LoopMS].Ships[LoopMS2] := How_Many;
+               End;
+         with Squadron[LoopMS] do
+            Begin
+               if Ships[1] + Ships[2] + Ships[3] + Ships[4] + Ships[5] +
+                  Ships[6] = 0 then Exit;
+               Distance_Left := Sqrt(Sqr(Planet[From_Where].X - Planet[To_Where].X) +
+                  Sqr(Planet[From_Where].Y - Planet[To_Where].Y));
+               if (Ships[4] > 0) or (Ships[5] > 0) then Squadron[LoopMS].Speed := 5;
+               if (Ships[3] > 0) or (Ships[6] > 0) then Squadron[LoopMS].Speed := 4;
+               if (Ships[1] > 0) or (Ships[2] > 0) then Squadron[LoopMS].Speed := 3;
+               print ('The squadron''s speed will be warp ' + St(Squadron[LoopMS].Speed));
+               print ('The distance the squadron will travel is ' + StReal(Distance_Left,2) + ' light years.');
+            End;
+         prompt ('Are you sure you want to send these ships? ');
+         if YN then
+            with Squadron[LoopMS] do
+               Begin
+                  Owner := Player_Number;
+                  Destination := To_Where;
+                  for LoopMS2 := 1 to Number_of_Ships do
+                     Planet[From_Where].Ships[LoopMS2] := Planet[From_Where].Ships[LoopMS2] -
+                         Ships[LoopMS2];
+                  print ('Squadron Sent');
+               End;
+      End;
+
+   overlay procedure Navy_Status;
+
+      Var
+        Loop : Byte;
+	counter: Integer;
+	LoopSKA : Integer;
+        Flag : Boolean;
+
+      Begin
+         writeln;
+         print ('Technology Level : ' + StReal(Empire[Player_Number].Technology_Level,1));
+         writeln;
+         print ('Planet       FR      DS      CR      BS      DN      SDN');
+         print ('-------------------------------------------------------');
+         for Loop := 1 to Number_of_Planets do
+            Begin
+               if Planet[Loop].Owner = Player_Number then
+                  with Planet[Loop] do
+                     print (addfront(St(Loop),3) + addfront(St(Ships[1]),12) +addfront(St(Ships[2]),8) +
+                            addfront(St(Ships[3]),8) + addfront(St(Ships[4]),8) + addfront(St(Ships[5]),8)+
+                            addfront(St(Ships[6]),8));
+               if Keypressed then Exit;
+            End;
+         if Empire[Player_Number].Planets > 0 then
+            print ('----------------------------------------------------------');
+         with Empire[Player_Number] do
+            print ('Totals '+addfront(St(Ships[1]),8)+addfront(St(Ships[2]),8) + addfront(St(Ships[3]),8) +
+               addfront(St(Ships[4]),8) +addfront(St(Ships[5]),8)+addfront(St(Ships[6]),8));
+
+{ --Siroos' Code Begins ----------------------------------------------}
+
+	writeln;
+	writeln;
+    print ( '                        Squadrons Sent:'); 
+    writeln;
+    counter := 0;
+    for LoopSKA := 1 to Number_of_Squads do
+       with Squadron[LoopSKA] do
+         if Owner = Player_Number  then
+           Begin
+                counter := counter + 1;
+		print( 'To: '+addfront(St(Destination),3)+
+                       ', Dist. left: '+ StReal(Distance_Left, 2)+
+                       ',  Speed: '+ addfront(St(Speed),1)+
+                       ',  Ships: '+ addfront(St(Ships[1]),3)+
+		       ',' + addfront(St(Ships[2]),3)+
+                       ',' + addfront(St(Ships[3]),3)+
+                       ',' + addfront(St(Ships[4]),3)+
+                       ',' + addfront(St(Ships[5]),3)+
+                       ',' + addfront(St(Ships[6]),3) );
+           End;
+    if counter = 0 then
+	   begin
+	   print ( 'None!' );
+           end;
+    writeln;
+    print ('                       Radars Installed: ');
+    counter := 0;
+    for LoopSKA := 1 to Number_of_Planets do
+       with Planet[LoopSKA] do
+         Begin
+          if (Owner = Player_Number) and (Radars[1] = 1) then Begin
+                print ( 'A short range radar on planet '+
+                       addfront (St(LoopSKA), 3) );
+                counter := 1;
+          End;
+          if (Owner = Player_Number) and (Radars[2] = 1) then Begin
+                print ( 'A mid range radar on planet '+
+                       addfront (St(LoopSKA), 3) );
+                counter := 1;
+          End;
+          if (Owner = Player_Number) and (Radars[3] = 1) then Begin
+                print ( 'A long range radar on planet '+
+                       addfront (St(LoopSKA), 3) );
+                counter := 1; 
+          End;
+         End;
+     if counter = 0 then
+         print ( 'None!' );
+
+{--Siroos' Code Ends    ----------------------------------------------}
+
+         PauseScr;
+         writeln;
+      End;
+
+{------SKA-----}
+   overlay procedure Examine_Radar;
+     Var
+        LoopSKA,
+        Attacked,
+        class,
+        flag    : Integer;
+
+    Begin
+    flag := 0;
+    for LoopSKA := 1 to Number_of_Squads do
+       with Squadron[LoopSKA] do
+         Begin
+             Attacked := Destination;
+             class := 0;
+             if (Planet[Attacked].Radars[1] <> 0 ) then class := 1;
+             if (Planet[Attacked].Radars[2] <> 0 ) then class := 2;
+             if (Planet[Attacked].Radars[3] <> 0 ) then class := 3;
+
+             if (class > 0 ) and
+                (Planet[Attacked].Owner = Player_Number) and
+                (Distance_left <= Radar_Range[class] ) then
+                Begin
+                  print ( 'Radar in planet '+ addfront(St(Attacked), 3)
+                         + ' reports an enemy attack:' );
+                  print (' From Empire:' + addfront(St(Owner), 2)
+                           + ', Dist.: ' + StReal(Distance_left, 2)
+                           + ', Speed: ' + addfront(St(Speed), 1)
+                           + ', Ships:' + addfront(St(Ships[1]), 3)
+                           + ','        + addfront(St(Ships[2]), 3)
+                           + ','        + addfront(St(Ships[3]), 3)
+                           + ','        + addfront(St(Ships[4]), 3)
+                           + ','        + addfront(St(Ships[5]), 3)
+                           + ','        + addfront(St(Ships[6]), 3)
+                        );
+                  flag := 1;
+                End;
+         End;
+     if flag = 0 then
+        print (' Nothing to report.' );
+     End;
+
+
+{ -------=======>*>*>!> Planet Menu Procedures <!<*<*<=======------- }
+
+   { All of the following procedures were called from the Planet Management
+     Menu.}
+
+   overlay procedure All_Manpower;
+
+      Var
+         SetNew, J1 : Integer;
+
+      Begin
+         writeln;
+         if not Check_Planets then Exit;
+         Repeat
+            prompt ('What percent of the population should work in industry? ');
+            Input (BigString, 3);
+            Val (BigString, SetNew, EC);
+            if EC <> 0 then Exit;
+         Until (SetNew >= 0) and (SetNew <= 100);
+         for J1 := 1 to Number_of_Planets do
+            Begin
+               if Planet[J1].Owner = Player_Number then
+                  Begin
+                     Planet[J1].Industry_Percent := SetNew;
+                     Planet[J1].Technology_Percent := 100 - SetNew;
+                  End;
+            End;
+         writeln;
+         print (St(SetNew) + ' % of all workers on every planet are now working in Industry.');
+         print (St(100-SetNew) + ' % of all workers on every planet are now working in Technology');
+         writeln;
+      End;
+
+   overlay procedure Change_Planet_Name;
+
+      Var
+         Which_Planet : Integer;
+         PlanetValid : Boolean;
+
+      Begin
+         PlanetValid := false;
+         writeln;
+         if not Check_Planets then Exit;
+         Repeat
+            prompt ('Change the name of which planet? ');
+            InputL (BigString, 3);
+            Val (BigString, Which_Planet, EC);
+            if EC <> 0 then Exit;
+            if BigString = '' then Exit;
+            if Which_Planet = 0 then Exit;
+            if (Which_Planet > 0) and (Which_Planet <= Number_of_Planets) and
+               (Planet[Which_Planet].Owner = Player_Number) then
+                  PlanetValid := true;
+         Until PlanetValid;
+         prompt ('What shall be the planet''s new name? ');
+         InputL (BigString, 20);
+         if BigString = '' then
+            Begin
+               print ('Aborted.');
+               Exit;
+            End;
+         Planet[Which_Planet].Planet_Name := BigString;
+         print ('Planet ' + St(Which_Planet) + '''s name is ' +
+            Planet[Which_Planet].Planet_Name + '.');
+      End;
+
+overlay procedure Increase_Industry;
+
+  Var
+   Which_Planet       : Integer;
+   How_Much, intmuch  : Real;
+   PlanetValid        : Boolean;
+
+  Begin
+    Repeat
+     PlanetValid := false;
+     writeln;
+     prompt ('Increase Industry Level of which planet? ');
+     InputL (BigString, 3);
+     Val (BigString, Which_Planet, EC);
+     if EC <> 0 then Exit;
+     if BigString = '' then Exit;
+     if Which_Planet = 0 then Exit;
+     if (Which_Planet > 0) and (Which_Planet <= Number_of_Planets)
+      and (Planet[Which_Planet].Owner = Player_Number) then PlanetValid := true;
+    Until PlanetValid;
+    writeln;
+    print ('You have ' + St(Empire[Player_Number].Industry_Units) + ' Industry Units.');
+    print ('Each increase of .01 costs 1 Unit.');
+    prompt ('Increase Industry by how much? ');
+    InputL (BigString, 3);
+    Val (BigString, How_Much, EC);
+    if EC <> 0 then Exit;
+    if How_Much < 0.01 then Exit;
+
+{    How_Much := How_Much * 100;
+    IntMuch := round (How_Much);
+    How_Much := IntMuch / 100;     }
+
+    if (How_Much * 100) > Empire[Player_Number].Industry_Units then
+      print ('You don''t have enough Industry Units available.');
+    if (How_Much * 100) <= Empire[Player_Number].Industry_Units then
+      Begin
+        Empire[Player_Number].Industry_Units:=Empire[Player_Number].Industry_Units - round(How_Much * 100);
+        Planet[Which_Planet].Industrial_Level := Planet[Which_Planet].Industrial_Level + How_Much;
+        print ('Industry Level of Planet ' + St(Which_Planet) + ' increased by ' +
+              StReal(How_Much,2) + ' to ' + StReal(Planet[Which_Planet].Industrial_Level,2) + '.');
+      End;
+  End;
+
+   overlay procedure Change_Manpower;
+
+      Var
+         Which_Planet, SetNew : Integer;
+         WhichValid : Boolean;
+
+      Begin
+         writeln;
+         if not Check_Planets then Exit;
+         WhichValid := false;
+         Repeat
+            prompt ('Change Manpower Allocation on what planet? ');
+            InputL (BigString, 3);
+            Val (BigString, Which_Planet, EC);
+            if EC <> 0 then Exit;
+            if BigString = '' then Exit;
+            if Which_Planet = 0 then Exit;
+            if (Which_Planet > 0) and (Which_Planet <= Number_of_Planets) and
+               (Planet[Which_Planet].Owner = Player_Number)
+                  then WhichValid := true;
+         Until WhichValid;
+         Repeat
+            writeln;
+            prompt ('What percent of the workers should produce industry? ');
+            InputL (BigString, 3);
+            Val (BigString, SetNew, EC);
+            if EC <> 0 then Exit;
+         Until (SetNew >= 0) and (SetNew <= 100);
+         Planet[Which_Planet].Industry_Percent := SetNew;
+         Planet[Which_Planet].Technology_Percent := 100 - SetNew;
+         print (addfront(St(SetNew),3) + ' % of the workers on planet ' + St(Which_Planet) + ' are producing industry.');
+         print (addfront(St(100-SetNew),3) + ' % of the workers on planet ' + St(Which_Planet) + ' are producing technology.');
+         writeln;
+      End;
+
+   overlay procedure Planet_Status;
+
+      Var
+         Which_Planet : Integer;
+         PlanetValid : Boolean;
+
+      Begin
+         writeln;
+         if not Check_Planets then Exit;
+            PlanetValid := false;
+         Repeat
+            prompt ('Which Planet do you with to see? ');
+            InputL (BigString, 3);
+            Val (BigString, Which_Planet, EC);
+            if EC <> 0 then Exit;
+            if BigString = '' then Exit;
+            if Which_Planet = 0 then Exit;
+            if (Which_Planet > 0) and (Which_Planet <= Number_of_Planets)
+               and (Planet[Which_Planet].Owner = Player_Number)
+                  then PlanetValid := true;
+         Until PlanetValid;
+         Print_Planet (Which_Planet);
+      End;
+
+overlay procedure Zoom_View;
+
+ Var
+  LoopZV : Byte;
+
+ Begin
+   writeln;
+   if not Check_Planets then Exit;
+   print ('Planet  Industry                Worker %      Percent');
+   print ('Number    Level   Population   Ind / Tech   Habitability');
+   print ('--------------------------------------------------------');
+   for LoopZV := 1 to Number_of_Planets do
+    if Planet[LoopZV].Owner = Player_Number then
+      with Planet[LoopZV] do
+       print(addfront(St(LoopZV),4)+addfront(StReal(Industrial_Level,2),10)+addfront(St(Population),14)
+          +addfront(St(Industry_Percent),6)+addfront(St(Technology_Percent),6)+addfront(st(habitability),11));
+   PauseScr;
+ End;
+
