@@ -23,8 +23,8 @@ RUN echo 'dominions:conquest' |chpasswd
 
 USER dominions
 WORKDIR /home/dominions
-ADD dom2v20b.zip dom2v20b.zip
-ADD DOM500.ZIP DOM500.ZIP
+ADD archive/dom2v20b.zip archive/dom2v20b.zip
+ADD archive/DOM500.ZIP archive/DOM500.ZIP
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
 ADD profile .profile

@@ -121,7 +121,7 @@ def install_dom2(source):
     Our current directory should be an empty game directory"""
     if os.path.exists('DOMIN2.EXE'):
         raise Exception("Refusing to install over an existing game")
-    call(['unzip', os.path.join(source, 'dom2v20b.zip')])
+    call(['unzip', os.path.join(source, 'archive/dom2v20b.zip')])
     call(['unzip', 'DOM2.EXE'])
 
 
@@ -133,10 +133,10 @@ def install(source):
     # We unzip to both output dir and DOM subdir.  Bit of a hack.
     # To keep dosemu happy that the output dir is C: and that game data
     # files reside in C:\DOM (which is hard-coded)
-    call(['unzip', os.path.join(source, 'DOM500.ZIP')])
+    call(['unzip', os.path.join(source, 'archive/DOM500.ZIP')])
     os.mkdir('DOM')
     os.chdir('DOM')
-    call(['unzip', os.path.join(source, 'DOM500.ZIP')])
+    call(['unzip', os.path.join(source, 'archive/DOM500.ZIP')])
     os.chdir('..')
 
 
