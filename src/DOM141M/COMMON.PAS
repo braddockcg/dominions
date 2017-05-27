@@ -15,7 +15,7 @@
   files are in the correct directory.
 }
 
-{$G1}{$P1}
+Uses Crt, sysutils; 
 
 CONST strlen=160;
 
@@ -35,7 +35,7 @@ TYPE str=string[strlen];
       regs=record ax,bx,cx,dx,bp,si,di,ds,es,flags:integer; end;
 
 var
-    sysopf:text[1024];
+    sysopf:text;
     sysopffn:string[80];
     gfilespath,datapath:string[80];
     usernum:integer;
@@ -44,19 +44,10 @@ var
     thisuser:userrec;
     rp:regs;
 
+{ Returns time in seconds }
 function timer:real;
-var reg:record
-          ax,bx,cx,dx,bp,si,di,ds,es,flags:integer;
-        end;
-    h,m,s,t:real;
 begin
-  reg.ax:=44*256;
-  msdos(reg);
-  h:=(reg.cx div 256);
-  m:=(reg.cx mod 256);
-  s:=(reg.dx div 256);
-  t:=(reg.dx mod 256);
-  timer:=h*3600+m*60+s+t/100;
+  timer := Real(Now);
 end;
 
 function nsl:real;
@@ -66,9 +57,11 @@ begin
   nsl:=timeleft-(timer-timeon);
 end;
 
+{ TODO: Actually detect if sysop }
 function sysop1:boolean;
 begin
-  if (mem[0:1047] and 16)=0 then sysop1:=false else sysop1:=true;
+    { if (mem[0:1047] and 16)=0 then sysop1:=false else sysop1:=true;}
+    sysop1 := false
 end;
 
 function sysop:boolean;
@@ -94,6 +87,13 @@ begin
   tch:=i;
 end;
 
+{ Returns current time as a string HH:MM:SS -bcg'17 }
+function time:str;
+begin
+    time := FormatDateTime('hh:nn:ss', Now)
+end;
+
+{ REMOVE:
 function time:str;
 var reg:record
           ax,bx,cx,dx,bp,si,di,ds,es,flags:integer;
@@ -104,7 +104,15 @@ begin
   str(reg.cx shr 8,h); str(reg.cx mod 256,m); str(reg.dx shr 8,s);
   time:=tch(h)+':'+tch(m)+':'+tch(s);
 end;
+}
 
+{ Returns current date in mm/dd/yy (y2k bug) -bcg'17 }
+function date:str;
+begin
+    date := FormatDateTime('mm/dd/yy', Now)
+end;
+
+{ REMOVE:
 function date:str;
 var reg:record
           ax,bx,cx,dx,bp,si,di,ds,es,flags:integer;
@@ -115,6 +123,7 @@ begin
   str(reg.dx shr 8,m);
   date:=tch(m)+'/'+tch(d)+'/'+tch(y);
 end;
+}
 
 function value(I:str):integer;
 var n,n1:integer;
@@ -129,9 +138,8 @@ begin
 end;
 
 function cstr(i:integer):str;
-var c:str;
 begin
-  str(i,c); cstr:=c;
+  cstr := IntToStr(i)
 end;
 
 function nam:str;
@@ -243,7 +251,6 @@ begin
 end;
 
 procedure sdc;
-var f:integer;
 begin
   ansic(0);
 end;
@@ -258,8 +265,8 @@ begin
     prompt(#8+' '+#8);
 end;
 
-procedure prompt;
-var c:integer; cc:char;
+procedure prompt(i:str);
+var c:integer;
 begin
   if (not hangup) then
     for c:=1 to length(i) do begin
@@ -302,7 +309,6 @@ begin
 end;
 
 procedure tleft;
-var x,y:integer;
 begin
   if timer<timeon then timeon:=timeon-24.0*60*60;
   if (nsl<0) then begin
@@ -314,34 +320,25 @@ begin
 end;
 
 
+{ Is the key buffer empty - ie, no key has been pressed -bcg'17 }
 function empty:boolean;
 begin
-  rp.ax:=$0b00;
-  msdos(rp);
-  if (rp.ax and $00ff)=$00 then
-    empty:=true
-  else
-    empty:=false;
+  empty := not KeyPressed;
 end;
 
 function inkey:char;
-var ch:char;
 begin
   if (empty) then
     inkey:=#0
   else begin
-    rp.ax:=$0800;
-    msdos(rp);
-    inkey:=chr(rp.ax and $00ff);
+    inkey:=ReadKey
   end;
 end;
 
 
-procedure getkey;
+procedure getkey(var c:char);
 begin
-    rp.ax:=$0800;
-    msdos(rp);
-    c:=chr(rp.ax and $00ff);
+    c := ReadKey
 end;
 
 procedure cls;
@@ -452,7 +449,7 @@ begin
 end;
 
 function cstrr(rl:real; base:integer):str;
-var c1,c2,c3:integer; i:str; r1,r2:real;
+var c1:integer; i:str; r1,r2:real;
 begin
  if rl<=0.0 then cstrr:='0' else begin
   r1:=ln(rl)/ln(1.0*base);
@@ -623,4 +620,3 @@ procedure topscr;
 begin
 end;
 
-

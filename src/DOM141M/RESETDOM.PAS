@@ -1,4 +1,5 @@
 Program Reset_Dominions;
+uses Crt;  { for Keypressed }
 
    { for Dominions! version 1.40A & 1.41 - March 1989 }
 

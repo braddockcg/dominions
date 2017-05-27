@@ -5,7 +5,7 @@
    { All of the following procedures are called from the Counterintelligence }
    { Menu.}
 
-   overlay procedure Spy_Empire;
+   procedure Spy_Empire;
 
       Var
          Spy_Empire_Number : Integer;
@@ -37,7 +37,7 @@
             End;
       End;
 
-   overlay procedure Spy_Planet;
+   procedure Spy_Planet;
 
       Var
          Spy_Planet_Number : Integer;
@@ -73,7 +73,7 @@
    { All of the following procedures were called from the Empire
      Management Menu.}
 
-   overlay procedure Announcement;
+   procedure Announcement;
 
       Var
          Recent_Happenings : Text;
@@ -94,7 +94,7 @@
          print ('Announcement Saved');
       End;
 
-   overlay procedure Change_Empire_Name;
+   procedure Change_Empire_Name;
 
       Begin
          writeln;
@@ -112,7 +112,7 @@
          print ('New Empire name is ' + Empire[Player_Number].Empire_Name);
       End;
 
-   overlay procedure Message;
+   procedure Message;
 
       Var
          Send_To_Whom : Integer;
@@ -142,7 +142,7 @@
          Send_Message (Player_Number, Send_To_Whom, BigString);
       End;
 
-   overlay procedure Increase_Technology;
+   procedure Increase_Technology;
 
       Var
          IntIncrease : Integer;
@@ -175,7 +175,7 @@
    { All of the following procedures were called from the Navy Management
      Menu.}
 
-   overlay procedure Build_Ships;
+   procedure Build_Ships;
 
       Var
          Building_Options : String[8];
@@ -260,7 +260,7 @@
 
 {----------SKA Begin-------}
 
-   overlay procedure Build_Radar;
+   procedure Build_Radar;
 
       Var
          Building_Options : String[8];
@@ -363,7 +363,7 @@
       End;
 
 {-------------SKA End---------------}
-   overlay procedure Compute_Distance;
+   procedure Compute_Distance;
 
       Var
          Planet1, Planet2 : Integer;
@@ -390,7 +390,7 @@
          print ('The distance is ' + StReal(Distance,2) + ' light years.');
       End;
 
-   overlay procedure Move_Ships;
+   procedure Move_Ships;
 
       Var
          From_Where, To_Where, Temp_Owner, How_Many, LoopMS, LoopMS2 : Integer;
@@ -470,7 +470,7 @@
                End;
       End;
 
-   overlay procedure Navy_Status;
+   procedure Navy_Status;
 
       Var
         Loop : Byte;
@@ -557,7 +557,7 @@
       End;
 
 {------SKA-----}
-   overlay procedure Examine_Radar;
+   procedure Examine_Radar;
      Var
         LoopSKA,
         Attacked,
@@ -604,7 +604,7 @@
    { All of the following procedures were called from the Planet Management
      Menu.}
 
-   overlay procedure All_Manpower;
+   procedure All_Manpower;
 
       Var
          SetNew, J1 : Integer;
@@ -632,7 +632,7 @@
          writeln;
       End;
 
-   overlay procedure Change_Planet_Name;
+   procedure Change_Planet_Name;
 
       Var
          Which_Planet : Integer;
@@ -665,7 +665,7 @@
             Planet[Which_Planet].Planet_Name + '.');
       End;
 
-overlay procedure Increase_Industry;
+procedure Increase_Industry;
 
   Var
    Which_Planet       : Integer;
@@ -709,7 +709,7 @@ overlay procedure Increase_Industry;
       End;
   End;
 
-   overlay procedure Change_Manpower;
+   procedure Change_Manpower;
 
       Var
          Which_Planet, SetNew : Integer;
@@ -744,7 +744,7 @@ overlay procedure Increase_Industry;
          writeln;
       End;
 
-   overlay procedure Planet_Status;
+   procedure Planet_Status;
 
       Var
          Which_Planet : Integer;
@@ -768,7 +768,7 @@ overlay procedure Increase_Industry;
          Print_Planet (Which_Planet);
       End;
 
-overlay procedure Zoom_View;
+procedure Zoom_View;
 
  Var
   LoopZV : Byte;
@@ -786,4 +786,3 @@ overlay procedure Zoom_View;
           +addfront(St(Industry_Percent),6)+addfront(St(Technology_Percent),6)+addfront(st(habitability),11));
    PauseScr;
  End;
-
