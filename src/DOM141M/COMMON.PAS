@@ -236,6 +236,11 @@ procedure getkey(var c:char); forward;
 procedure prompt(i:str); forward;
 
 
+{$ifdef ANSI}
+procedure ansic(c:integer);
+begin
+end;
+{$else}
 procedure ansic(c:integer);
 var i:str;
 begin
@@ -249,6 +254,7 @@ begin
   i:=#3+chr(ord('0')+c);
   prompt(i);
 end;
+{$endif} 
 
 procedure sdc;
 begin
