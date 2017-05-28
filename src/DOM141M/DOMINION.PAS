@@ -148,8 +148,7 @@ function St (StA : Real) : String160;
 
  Begin
    sta:=sta-frac(sta);
-   BS := IntToStr(round(sta));
-   { str (StA:0:0,BS); }
+   system.Str (StA:0:0,BS);
    SN := length (BS);
    if SN > 4 then
      While SN > 3 do
@@ -160,7 +159,6 @@ function St (StA : Real) : String160;
    St := BS;
 End;
 
-{ FIXME: I'm ignoring the precision W - bcg'17 }
 function StReal (Z : Real; W : Integer) : String160;
 
    {St function for reals using decimals.}
@@ -169,11 +167,8 @@ function StReal (Z : Real; W : Integer) : String160;
    SV : String160;
 
   Begin
-    StReal := FloatToStr(Z)
-    {
-    Str (Z:0:W,SV);
+    system.Str (Z:0:W,SV);
     StReal := SV;
-    }
   End;
 
 
