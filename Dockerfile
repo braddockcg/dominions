@@ -13,6 +13,13 @@ RUN mkdir /var/run/sshd
 # RUN echo 'root:root' |chpasswd
 # RUN sed -ri 's/^PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 # RUN sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config
+RUN sed -ri 's/X11Forwarding yes/X11Forwarding no/g' /etc/ssh/sshd_config
+RUN sed -ri 's/Subsystem sftp/#Subsystem sftp/g' /etc/ssh/sshd_config
+
+RUN echo >>/etc/ssh/sshd_config
+RUN echo 'AllowTcpForwarding no' >>/etc/ssh/sshd_config
+RUN echo 'PermitTunnel no' >>/etc/ssh/sshd_config
+RUN echo 'ForceCommand /home/dominions/dominions.py --gamedir /home/dominions/gamedir run' >>/etc/ssh/sshd_config
 
 EXPOSE 22
 
@@ -27,7 +34,7 @@ ADD archive/dom2v20b.zip archive/dom2v20b.zip
 ADD archive/DOM500.ZIP archive/DOM500.ZIP
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
-ADD profile .profile
+#ADD profile .profile
 ADD CP437.TXT CP437.TXT
 ADD ansi2unicode ansi2unicode
 
