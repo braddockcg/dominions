@@ -1,9 +1,8 @@
 FROM       ubuntu:16.04
 MAINTAINER Braddock Gaskill "https://github.com/braddockcg"
-# MAINTAINER Aleksandar Diklic "https://github.com/rastasheep"
+ARG VERSION
 
 RUN apt-get update
-
 RUN apt-get install -y dosemu dos2unix sudo zip unzip file telnet 
 RUN apt-get install -y screen openssh-client vim less python3-pip
 RUN apt-get install -y openssh-server
@@ -32,16 +31,14 @@ USER dominions
 WORKDIR /home/dominions
 ADD archive/dom2v20b.zip archive/dom2v20b.zip
 ADD archive/DOM500.ZIP archive/DOM500.ZIP
+ADD src src
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
 #ADD profile .profile
 ADD CP437.TXT CP437.TXT
 ADD ansi2unicode ansi2unicode
 
-# Uncomment one of the following lines to install 
-# the original Dominions or Dominions ][ (--dom2)
-RUN ./dominions.py install gamedir
-#RUN ./dominions.py install --dom2 gamedir
+RUN ./dominions.py install --version ${VERSION} gamedir
 
 USER root
 CMD    ["/usr/sbin/sshd", "-D"]

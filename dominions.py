@@ -6,6 +6,7 @@ import argparse
 import io
 import json
 import time
+import shutil
 from getpass import getpass
 from datetime import datetime, timedelta
 from subprocess import check_call
@@ -116,7 +117,7 @@ def dosemu_ansi(args):
     call(s, shell=True)
 
 
-def install_dom2(source):
+def install_2000(source):
     """Install Dominions ][.
     Our current directory should be an empty game directory"""
     if os.path.exists('DOMIN2.EXE'):
@@ -125,7 +126,7 @@ def install_dom2(source):
     call(['unzip', 'DOM2.EXE'])
 
 
-def install(source):
+def install_500(source):
     """Install the original Dominions.
     Our current directory should be an empty game directory"""
     if os.path.exists('DOMINION.EXE'):
@@ -140,13 +141,25 @@ def install(source):
     os.chdir('..')
 
 
+def install_141(source):
+    """Install Version 141 from the build directory"""
+    if os.path.exists('DOMINION'):
+        raise Exception("Refusing to install over an existing game")
+    build_dir = os.path.join(source, 'src/DOM141M')
+    for name in os.listdir(build_dir):
+        src = os.path.join(build_dir, name)
+        shutil.copy2(src, '.')
+
+
 def initialize_game(gamedb):
     """This will initialize both Dominions ][ and the original Dominions"""
     dosemurc = os.path.join(get_source_dir(), 'dosemurc')
-    if gamedb.is_version_1():
+    if gamedb.get_version() == '500':
         cmd = 'dosemu -dumb -f ' + dosemurc + ' DOM/RESETDOM.EXE'
-    else:
+    elif gamedb.get_version() == '2000':
         cmd = 'echo -n "y" | dosemu -dumb -f ' + dosemurc + ' RESETDOM.EXE'
+    elif gamedb.get_version() == '141':
+        cmd = './RESETDOM'
     call(cmd, shell=True)
     gamedb.db['initialized'] = True
     gamedb.save()
@@ -167,11 +180,12 @@ def write_chain_file(fname, chain_data):
 def run_turns(username, gamedb):
     now = datetime.utcnow()
     while now > gamedb.get_next_turn_timestamp():
-        if gamedb.is_version_1():
+        if gamedb.get_version() == '500':
             create_chain_file(username, gamedb)
             dosemu(['MAINTAIN.EXE', 'CHAIN.TXT'])
-        else:
+        elif gamedb.get_version() == '2000':
             dosemu(['DOMEVENT.EXE'])
+        # Note, maintain is automatic for version() == 141
         gamedb.increment_turn_timestamp()
 
 
@@ -183,14 +197,18 @@ def create_chain_file(username, gamedb):
     chain['user_real_name'] = username
     write_chain_file('CHAIN.TXT', chain)
 
-def run_dom2(username, gamedb):
+def run_2000(username, gamedb):
     create_chain_file(username, gamedb)
     dosemu_ansi(['DOMIN2.EXE'])
 
 
-def run(username, gamedb):
+def run_500(username, gamedb):
     create_chain_file(username, gamedb)
     dosemu_ansi(['DOMINION.EXE', 'CHAIN.TXT'])
+
+def run_141(username, gamedb):
+    create_chain_file(username, gamedb)
+    call(['./DOMINION', 'CHAIN.TXT'])
 
 
 class GameDB(object):
@@ -200,8 +218,11 @@ class GameDB(object):
                 'users': {},
                 'turn_period': 60 * 60 * 24,
                 'initialized': False,
-                'version': 1
+                'version': '141'
                 }
+        self.supported_versions = ['141', '500', '2000']
+        if self.db['version'] not in self.supported_versions:
+            raise Exception("Unsupported Dominions Version " + str(self.db['version']))
 
     def load(self):
         if not os.path.exists(self.fname):
@@ -266,9 +287,6 @@ class GameDB(object):
     def get_version(self):
         return self.db['version']
 
-    def is_version_1(self):
-        return self.db['version'] == 1
-
     def rm_user(self, username):
         del self.db['users'][username]
         self.save()
@@ -314,8 +332,8 @@ def main():
     install_parser.add_argument('target', help='Directory to install a new Dominions Game into')
     install_parser.add_argument('--source', required=False, default=get_source_dir(), 
             help='(optional) Directory to install a new Dominions Game FROM')
-    install_parser.add_argument('--dom2', required=False, default=False, action='store_true',
-            help='Install Sean Braids Dominions ][ fork')
+    install_parser.add_argument('--version', required=False, default='141',
+            help='Version of Dominions to install one of 141, 500, or 2000')
 
     add_parser = subparsers.add_parser('add', help='Add a new user')
     add_parser.add_argument('user', help='username to add')
@@ -348,11 +366,17 @@ def main():
             gamedb.load()
 
             if args.cmd == 'install':
-                if args.dom2:
-                    install_dom2(args.source)
-                    gamedb.set_version(2)
-                else:
-                    install(args.source)
+                if args.version not in gamedb.supported_versions:
+                    raise Exception('Dominions Version ' + str(args.version) +' is not supported')
+
+                if args.version == '2000':
+                    install_2000(args.source)
+                elif args.version == '500':
+                    install_500(args.source)
+                elif args.version == '141':
+                    install_141(args.source)
+
+                gamedb.set_version(args.version)
                 nxt = datetime.utcnow() + timedelta(seconds=gamedb.db['turn_period'])
                 gamedb.save_next_turn_timestamp(nxt)
                 gamedb.save_turn_timestamp()
@@ -389,10 +413,12 @@ def main():
                     initialize_game(gamedb)
                 # Dominions requires explicit running of the nightly maintenance,
                 run_turns(username, gamedb)
-                if gamedb.is_version_1():
-                    run(username, gamedb)
-                else:
-                    run_dom2(username, gamedb)
+                if gamedb.get_version() == '500':
+                    run_500(username, gamedb)
+                elif gamedb.get_version() == '2000':
+                    run_2000(username, gamedb)
+                elif gamedb.get_version() == '141':
+                    run_141(username, gamedb)
     except filelock.Timeout:
         print("Someone else is playing, try again later.")
 
