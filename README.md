@@ -4,6 +4,8 @@ Dominions BBS Game with utility for running it without WWIV by Braddock Gaskill
 (braddock@braddock.com), May 2017.  Thanks to Chris Lozaga for essential
 assistance.
 
+![Splash Screen](splash_screen.png)
+
 This repository contains a python script and configuration files for running
 either the original Dominions or the Dominions ][ WWIV BBS Door Games.  It does
 not require a WWIV BBS installation.
