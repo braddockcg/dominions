@@ -1,8 +1,14 @@
+"""Dominions Calc, a utility to help with Dominions math,
+By Braddock Gaskill (braddock@braddock.com) 2017"""
+
 from random import randint
 from copy import deepcopy
+from math import floor, sqrt
+from itertools import islice
 
 
 class Ship(object):
+    """Represents a class of ship, and the defining characteristics"""
     def __init__(self, name, cost, tech, attack, defense, damage):
         self.name = name
         self.cost = cost
@@ -10,6 +16,7 @@ class Ship(object):
         self.attack = attack
         self.defense = defense
         self.damage = damage
+
 
 global ships
 ships = {
@@ -21,7 +28,9 @@ ships = {
         'SuperDreadnought': Ship('SuperDreadnought', 160, 15., 32, 48, 255)
        }
 
+
 class Fleet(object):
+    """Represents a fleet of ships"""
     def __init__(self, frigates=0, destroyers=0, cruisers=0, battleships=0,
             dreadnoughts=0, superdreadnoughts=0):
         global ships
@@ -61,11 +70,14 @@ class Fleet(object):
 
 
 class Fight(object):
+    """Represents a fight between two fleets"""
+
     def __init__(self, attacker, defender):
         self.attacker = deepcopy(attacker)
         self.defender = deepcopy(defender)
 
     def determine_losses(self, fleet, damage):
+        """Determine the ships destroyed in one round of fighting"""
         while True:  # Until damage < 1
             victim = fleet.get_random_ship()
             fleet.destroy_ship(victim)
@@ -76,6 +88,11 @@ class Fight(object):
                 break
 
     def round(self):
+        """One round of fighting
+        return - True if the attacker wins (defender destroyed), 
+                 false if the defender wins (attacker destroyed), 
+                 None if neither side wins yet.
+        """
         attack_damage = 0.0
         for ship in self.attacker.ships:
             a = ship[0].attack
@@ -100,11 +117,15 @@ class Fight(object):
         return attack_succeeds
 
     def fight(self):
+        """Perform rounds of fighting until one fleet is destroyed.
+        return value - True if the attacker wins, false if the defender wins"""
         while True:
             attack_succeeds = self.round()
             if attack_succeeds is not None:
                 return attack_succeeds
 
+
+def chance_of_winning(attacker, defender):
 """
 Runs a series of mock battles between two fleets, and 
 predicts the probability that the attacker will win against
@@ -115,7 +136,6 @@ Example Usage:
     dc.chance_of_winning(dc.Fleet(frigates=29,destroyers=2), dc.Fleet(frigates=20))
     Attacker has 43.00% chance of winning.
 """
-def chance_of_winning(attacker, defender):
     n = 100
     wins = 0
     for i in range(n):
@@ -125,4 +145,42 @@ def chance_of_winning(attacker, defender):
     percent = 100. * float(wins) / n
     print("Attacker has %.1f%% chance of winning." % percent)
     return percent
+
+
+def population_gen(start_pop, habitability, owned=True):
+    """This generator yields the population as it grows
+    for a planet"""
+    pop = start_pop
+    while True:
+        if owned:
+            divisor = 1000.
+        else:
+            divisor = 2000.
+        pop = floor(pop * ((float(habitability) / divisor) + 1.05))
+        yield pop
+
+
+def population(n, start_pop, habitability, owned=True):
+    """Project population into the future.  Returns a list,
+    one population per turn.  n specifies the number of turns
+    to return"""
+    return list(islice(population_gen(start_pop, habitability, owned), n))
+
+
+def production(pop, level, industry_percent):
+    """Compute the production of technology and industry units
+    for the given population and industrial level.
+    pop = population of planet
+    level = industry level of planet
+    industry_percent = percentage of workforce allocated 
+                       to industry (vs technology)
+    
+    Returns a tuple (industry_units, tech_units)"""
+    pop = float(pop)
+    level = float(level)
+    industry_fraction = (industry_percent / 100.)
+    tech_fraction = 1 - industry_fraction
+    iu = floor(industry_fraction * (pop / 1000.) * sqrt(level))
+    tu = floor(tech_fraction * (pop / 2500.) * sqrt(level))
+    return (iu, tu)
 
