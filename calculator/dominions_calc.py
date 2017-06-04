@@ -6,6 +6,8 @@ from copy import deepcopy
 from math import floor, sqrt
 from itertools import islice
 
+import numpy as np
+
 
 class Ship(object):
     """Represents a class of ship, and the defining characteristics"""
@@ -126,16 +128,16 @@ class Fight(object):
 
 
 def chance_of_winning(attacker, defender):
-"""
-Runs a series of mock battles between two fleets, and 
-predicts the probability that the attacker will win against
-the defender.
+    """
+    Runs a series of mock battles between two fleets, and 
+    predicts the probability that the attacker will win against
+    the defender.
 
-Example Usage:
-    import dominions_calc as dc 
-    dc.chance_of_winning(dc.Fleet(frigates=29,destroyers=2), dc.Fleet(frigates=20))
-    Attacker has 43.00% chance of winning.
-"""
+    Example Usage:
+        import dominions_calc as dc 
+        dc.chance_of_winning(dc.Fleet(frigates=29,destroyers=2), dc.Fleet(frigates=20))
+        Attacker has 43.00% chance of winning.
+    """
     n = 100
     wins = 0
     for i in range(n):
@@ -184,3 +186,54 @@ def production(pop, level, industry_percent):
     tu = floor(tech_fraction * (pop / 2500.) * sqrt(level))
     return (iu, tu)
 
+
+def project_production(n, start_pop, habitability, owned, level, industry_percent):
+    """Project industrial and technological output for a planet for the 
+    next n months"""
+    r=[]
+    populations = population(n, start_pop, habitability, owned)
+    for i in range(n):
+        (iu, tu) = production(populations[i], level, industry_percent)
+        r.append((iu, tu))
+    return r
+
+
+def sum_project_production(turns, start_pop, habitability, owned, level, industry_percent):
+    units = project_production(turns, start_pop, habitability, owned, level, industry_percent)
+    iu = sum([x[0] for x in units])
+    tu = sum([x[1] for x in units])
+    return (iu, tu)
+    
+
+def argmax(arr):
+    return arr.index(max(arr))
+    #return np.argmax(arr)
+
+
+def industry_level_gain(turns, current_industry_level, new_industry_level, population, habitability):
+    baseline_iu, _ = sum_project_production(turns, population, habitability, True, current_industry_level, 100.0)
+    new_iu, _ = sum_project_production(turns, population, habitability, True, new_industry_level, 100.0)
+    gain = new_iu - baseline_iu - 100.0*(new_industry_level - current_industry_level)
+    print("Over %i turns at level %.2f, %i IUs are produced" % (turns, current_industry_level, baseline_iu))
+    print("              at level %.2f, %i IUs are produced, a net gain of %i" % (new_industry_level, new_iu, gain))
+    return gain
+
+
+def industry_level_payback(turns, current_industry_level, population, habitability): 
+    """Compute the optimal amount by which to increase your industry level on a planet.
+    This brute force computes the projected industry unit gain for expendatures of between
+    0 and 10,000 industrial units and returns the most profitable investment over the
+    specified number of tunrs"""
+    baseline_iu, _ = sum_project_production(turns, population, habitability, True, current_industry_level, 100.0)
+    print("baseline=", baseline_iu)
+    gains = []
+    for investment in range(10000):
+        level = current_industry_level + float(investment) / 100.0
+        iu, _ = sum_project_production(turns, population, habitability, True, level, 100.0)
+        gain = iu - baseline_iu - investment
+        gains.append(gain)
+    best_investment = argmax(gains) 
+    print("Best investment is %i units to increase industry level to %.2f\nfor a net gain over %i turns of %i units" % (best_investment, current_industry_level + (float(best_investment) / 100.), turns, gains[best_investment]))
+    return best_investment
+
+        
