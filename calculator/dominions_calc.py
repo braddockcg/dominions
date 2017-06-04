@@ -223,7 +223,17 @@ def industry_level_payback(turns, current_industry_level, population, habitabili
     """Compute the optimal amount by which to increase your industry level on a planet.
     This brute force computes the projected industry unit gain for expendatures of between
     0 and 10,000 industrial units and returns the most profitable investment over the
-    specified number of tunrs"""
+    specified number of turns.
+    
+    EXAMPLE: 
+    How much should I invest in increasing the industry level of a planet with
+    a population of 15,000, a current industry level of 1.5, and a habitability of 75%
+    for maximum gain after 10 turns?
+
+    dc.industry_level_payback(10, 1.5, 15000, 75)
+    Best investment is 70 units to increase industry level to 2.20
+    for a net gain over 10 turns of 9 units
+    """
     baseline_iu, _ = sum_project_production(turns, population, habitability, True, current_industry_level, 100.0)
     print("baseline=", baseline_iu)
     gains = []
