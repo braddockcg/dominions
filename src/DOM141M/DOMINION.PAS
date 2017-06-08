@@ -237,6 +237,9 @@ function StReal (Z : Real; W : Integer) : String160;
       Begin
          Ansic (0);
          cls;
+         PrintFile ('Picture.Dom');
+         Delay(750);
+         cls;
          print ('Programming and Design...   Apocalypse');
          print ('Thanks to...                 The Catt');
          print ('                            Tarl Cabot');
@@ -245,9 +248,9 @@ function StReal (Z : Real; W : Integer) : String160;
          print ('Playtesting...           The Pandemonium');
          print ('                           Playtesters');
          print ('Addition of Radars...     Siroos Afshar');
-         PauseScr;
-         cls;
-         PrintFile ('Picture.Dom');
+         print ('2017 port to Free Pascal Braddock Gaskill');
+         {PauseScr;}
+         Delay(750);
       End;
 
    procedure Load_Information;
