@@ -19,6 +19,12 @@ class Ship(object):
         self.defense = defense
         self.damage = damage
 
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return self.name
+
 
 global ships
 ships = {
@@ -43,7 +49,7 @@ class Fleet(object):
         self.ships.append((ships['Battleship'], battleships))
         self.ships.append((ships['Dreadnought'], dreadnoughts))
         self.ships.append((ships['SuperDreadnought'], superdreadnoughts))
-      
+
     def number_of_ships(self):
         return sum([s[1] for s in self.ships])
 
@@ -70,6 +76,9 @@ class Fleet(object):
         if self.ships[idx][1] < 0:
             raise Exception("destroy_ship destroyed a non-existent ship")
 
+    def __str__(self):
+        return str(self.ships)
+
 
 class Fight(object):
     """Represents a fight between two fleets"""
@@ -91,19 +100,23 @@ class Fight(object):
 
     def round(self):
         """One round of fighting
-        return - True if the attacker wins (defender destroyed), 
-                 false if the defender wins (attacker destroyed), 
+        return - True if the attacker wins (defender destroyed),
+                 false if the defender wins (attacker destroyed),
                  None if neither side wins yet.
         """
         attack_damage = 0.0
         for ship in self.attacker.ships:
             a = ship[0].attack
-            attack_damage += randint(0, a + 1) + a
+            n = ship[1]  # Number of ships of this class
+            for i in range(n):
+                attack_damage += randint(0, a + 1) + a
 
         defense_damage = 0.0
         for ship in self.defender.ships:
             d = ship[0].defense
-            defense_damage += randint(0, d + 1) + d
+            n = ship[1]  # Number of ships of this class
+            for i in range(n):
+                defense_damage += randint(0, d + 1) + d
 
         attack_succeeds = None
         if self.defender.fleet_destroyed():
@@ -129,12 +142,12 @@ class Fight(object):
 
 def chance_of_winning(attacker, defender):
     """
-    Runs a series of mock battles between two fleets, and 
+    Runs a series of mock battles between two fleets, and
     predicts the probability that the attacker will win against
     the defender.
 
     Example Usage:
-        import dominions_calc as dc 
+        import dominions_calc as dc
         dc.chance_of_winning(dc.Fleet(frigates=29,destroyers=2), dc.Fleet(frigates=20))
         Attacker has 43.00% chance of winning.
     """
@@ -144,7 +157,7 @@ def chance_of_winning(attacker, defender):
         attacker_won = Fight(attacker, defender).fight()
         if attacker_won:
             wins += 1
-    percent = 100. * float(wins) / n
+    percent = 100. * float(wins) / float(n)
     print("Attacker has %.1f%% chance of winning." % percent)
     return percent
 
@@ -174,9 +187,9 @@ def production(pop, level, industry_percent):
     for the given population and industrial level.
     pop = population of planet
     level = industry level of planet
-    industry_percent = percentage of workforce allocated 
+    industry_percent = percentage of workforce allocated
                        to industry (vs technology)
-    
+
     Returns a tuple (industry_units, tech_units)"""
     pop = float(pop)
     level = float(level)
@@ -188,7 +201,7 @@ def production(pop, level, industry_percent):
 
 
 def project_production(n, start_pop, habitability, owned, level, industry_percent):
-    """Project industrial and technological output for a planet for the 
+    """Project industrial and technological output for a planet for the
     next n months"""
     r=[]
     populations = population(n, start_pop, habitability, owned)
@@ -203,7 +216,7 @@ def sum_project_production(turns, start_pop, habitability, owned, level, industr
     iu = sum([x[0] for x in units])
     tu = sum([x[1] for x in units])
     return (iu, tu)
-    
+
 
 def argmax(arr):
     return arr.index(max(arr))
@@ -219,13 +232,13 @@ def industry_level_gain(turns, current_industry_level, new_industry_level, popul
     return gain
 
 
-def industry_level_payback(turns, current_industry_level, population, habitability): 
+def industry_level_payback(turns, current_industry_level, population, habitability):
     """Compute the optimal amount by which to increase your industry level on a planet.
     This brute force computes the projected industry unit gain for expendatures of between
     0 and 10,000 industrial units and returns the most profitable investment over the
     specified number of turns.
-    
-    EXAMPLE: 
+
+    EXAMPLE:
     How much should I invest in increasing the industry level of a planet with
     a population of 15,000, a current industry level of 1.5, and a habitability of 75%
     for maximum gain after 10 turns?
@@ -242,8 +255,8 @@ def industry_level_payback(turns, current_industry_level, population, habitabili
         iu, _ = sum_project_production(turns, population, habitability, True, level, 100.0)
         gain = iu - baseline_iu - investment
         gains.append(gain)
-    best_investment = argmax(gains) 
+    best_investment = argmax(gains)
     print("Best investment is %i units to increase industry level to %.2f\nfor a net gain over %i turns of %i units" % (best_investment, current_industry_level + (float(best_investment) / 100.), turns, gains[best_investment]))
     return best_investment
 
-        
+
