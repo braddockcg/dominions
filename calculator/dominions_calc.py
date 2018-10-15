@@ -6,8 +6,6 @@ from copy import deepcopy
 from math import floor, sqrt
 from itertools import islice
 
-import numpy as np
-
 
 class Ship(object):
     """Represents a class of ship, and the defining characteristics"""
@@ -28,19 +26,19 @@ class Ship(object):
 
 global ships
 ships = {
-        'Frigate' : Ship('Frigate',     5, 1.,  1, 2, 5),
-        'Destroyer': Ship('Destroyer',  10, 2.,  2, 3, 11),
-        'Cruiser': Ship('Cruiser',    20, 3.5, 4, 6, 24),
-        'Battleship': Ship('Battleship', 40, 5.5, 8, 12,53),
-        'Dreadnought': Ship('Dreadnought', 80, 9., 16, 24,116),
-        'SuperDreadnought': Ship('SuperDreadnought', 160, 15., 32, 48, 255)
-       }
+    'Frigate': Ship('Frigate',     5, 1.,  1, 2, 5),
+    'Destroyer': Ship('Destroyer',  10, 2.,  2, 3, 11),
+    'Cruiser': Ship('Cruiser',    20, 3.5, 4, 6, 24),
+    'Battleship': Ship('Battleship', 40, 5.5, 8, 12, 53),
+    'Dreadnought': Ship('Dreadnought', 80, 9., 16, 24, 116),
+    'SuperDreadnought': Ship('SuperDreadnought', 160, 15., 32, 48, 255)
+}
 
 
 class Fleet(object):
     """Represents a fleet of ships"""
     def __init__(self, frigates=0, destroyers=0, cruisers=0, battleships=0,
-            dreadnoughts=0, superdreadnoughts=0):
+                 dreadnoughts=0, superdreadnoughts=0):
         global ships
         self.ships = []
         self.ships.append((ships['Frigate'], frigates))
@@ -140,7 +138,7 @@ class Fight(object):
                 return attack_succeeds
 
 
-def chance_of_winning(attacker, defender):
+def chance_of_winning(attacker, defender, silent=False):
     """
     Runs a series of mock battles between two fleets, and
     predicts the probability that the attacker will win against
@@ -158,7 +156,8 @@ def chance_of_winning(attacker, defender):
         if attacker_won:
             wins += 1
     percent = 100. * float(wins) / float(n)
-    print("Attacker has %.1f%% chance of winning." % percent)
+    if not silent:
+        print("Attacker has %.1f%% chance of winning." % percent)
     return percent
 
 
@@ -203,7 +202,7 @@ def production(pop, level, industry_percent):
 def project_production(n, start_pop, habitability, owned, level, industry_percent):
     """Project industrial and technological output for a planet for the
     next n months"""
-    r=[]
+    r = []
     populations = population(n, start_pop, habitability, owned)
     for i in range(n):
         (iu, tu) = production(populations[i], level, industry_percent)
@@ -226,7 +225,7 @@ def argmax(arr):
 def industry_level_gain(turns, current_industry_level, new_industry_level, population, habitability):
     baseline_iu, _ = sum_project_production(turns, population, habitability, True, current_industry_level, 100.0)
     new_iu, _ = sum_project_production(turns, population, habitability, True, new_industry_level, 100.0)
-    gain = new_iu - baseline_iu - 100.0*(new_industry_level - current_industry_level)
+    gain = new_iu - baseline_iu - 100.0 * (new_industry_level - current_industry_level)
     print("Over %i turns at level %.2f, %i IUs are produced" % (turns, current_industry_level, baseline_iu))
     print("              at level %.2f, %i IUs are produced, a net gain of %i" % (new_industry_level, new_iu, gain))
     return gain
@@ -260,3 +259,18 @@ def industry_level_payback(turns, current_industry_level, population, habitabili
     return best_investment
 
 
+def frigate_chart():
+    """Displays a chart of the number of frigates
+    needed for 99% assurance of victory"""
+    print("Number of attacking Frigates required to take a planet " +
+          "with the number of defending Frigates.")
+    print()
+    print("Defending\t# of Frigate to win 99% of the time")
+    for defending_frigates in range(1, 25):
+        for attacking_frigates in range(1, 50):
+            attacking = Fleet(frigates=attacking_frigates)
+            defending = Fleet(frigates=defending_frigates)
+            chance = chance_of_winning(attacking, defending, silent=True)
+            if chance > 99.0:
+                print("%2i       \t%2i" % (defending_frigates, attacking_frigates))
+                break
