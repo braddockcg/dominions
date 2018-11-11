@@ -76,5 +76,4 @@ def print_ansi_map(planets, use_color=True):
 if __name__ == "__main__":
     fname = sys.argv[1]
     planets = load_planets(fname)
-    space = planets_to_space(planets)
     print_ansi_map(planets)

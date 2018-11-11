@@ -70,7 +70,14 @@ ssh -p2222 dominions@localhost
 ### Setting the nightly maintenance time
 
 You probably want to set the time for nightly maintenance
-to midnight local time.  You set it by editing gamedir/gamedb.json
+to midnight local time.  
+
+If you are using versions 140 or 141, Dominions will automatically run at the first
+login after midnight in the timezone of your container.  You must set the time
+zone in the container.
+
+For other versions of Dominions, you set the turn time by editing
+gamedir/gamedb.json
 
 Note that this time will be ignored by versions 141 and 140.
 
