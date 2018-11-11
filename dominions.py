@@ -15,6 +15,7 @@ import hashlib, binascii
 # pip3 install filelock
 import filelock
 
+import maps
 
 chain_defaults = {
     'user_number': 1,
@@ -249,7 +250,7 @@ class GameDB(object):
         strsalt = binascii.hexlify(salt).decode('utf-8')
         user_id = self.get_max_userid() + 1
         self.db['users'][username] = {
-                'password': p, 
+                'password': p,
                 'salt': strsalt,
                 'id': user_id
                 }
@@ -304,17 +305,30 @@ class GameDB(object):
         else:
             return False
 
+    def print_map(self):
+        if self.get_version() != '141':
+            print("Maps only support for Dominions version 141")
+            return
+        fname = "Planets.Dom"
+        planets = maps.load_planets(fname)
+        maps.print_ansi_map(planets)
+        input("( * ) Press Enter to continue")
+
     def select_user(self):
         usernames = list(self.db['users'].keys())
         usernames.sort()
         print("0. New User")
         for idx, username in enumerate(usernames):
             print('%i. %s' % (idx + 1, username))
+        print("M. Print Map")
         idx = input('User number? ')
         try:
             idx = int(idx) - 1
         except ValueError as e:  # Might be username string
-            if idx in usernames:
+            if idx in ['m', 'M']:
+                self.print_map()
+                return self.select_user()
+            elif idx in usernames:
                 return idx
             else:
                 raise Exception("Invalid user selection.")
@@ -326,14 +340,14 @@ class GameDB(object):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gamedir', default='.', 
+    parser.add_argument('--gamedir', default='.',
             help='Game directory.  Defaults to current directory.')
 
     subparsers = parser.add_subparsers(help='sub-command', dest='cmd')
 
     install_parser = subparsers.add_parser('install', help='Install a new Dominions Game')
     install_parser.add_argument('target', help='Directory to install a new Dominions Game into')
-    install_parser.add_argument('--source', required=False, default=get_source_dir(), 
+    install_parser.add_argument('--source', required=False, default=get_source_dir(),
             help='(optional) Directory to install a new Dominions Game FROM')
     install_parser.add_argument('--version', required=False, default='141',
             help='Version of Dominions to install one of 141, 500, or 2000')

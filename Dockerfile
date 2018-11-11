@@ -6,7 +6,7 @@ RUN apt-get update
 RUN apt-get install -y dosemu dos2unix sudo zip unzip file telnet 
 RUN apt-get install -y screen openssh-client vim less python3-pip
 RUN apt-get install -y openssh-server
-RUN pip3 install filelock
+RUN pip3 install filelock cstruct ansicolors
 RUN mkdir /var/run/sshd
 
 # RUN echo 'root:root' |chpasswd
@@ -34,6 +34,7 @@ ADD archive/DOM500.ZIP archive/DOM500.ZIP
 ADD src src
 ADD dosemurc dosemurc
 ADD dominions.py dominions.py
+ADD maps.py maps.py
 #ADD profile .profile
 ADD CP437.TXT CP437.TXT
 ADD ansi2unicode ansi2unicode
