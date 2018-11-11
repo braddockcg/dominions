@@ -8,7 +8,7 @@ import json
 import time
 import shutil
 from getpass import getpass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo, timezone
 from subprocess import check_call
 import hashlib, binascii
 
@@ -177,8 +177,11 @@ def write_chain_file(fname, chain_data):
         f.write(chain_template.format(**data))
 
 
+def utcnow():
+    return datetime.now(timezone.utc)
+
 def run_turns(username, gamedb):
-    now = datetime.utcnow()
+    now = utcnow()
     while now > gamedb.get_next_turn_timestamp():
         if gamedb.get_version() == '500':
             create_chain_file(username, gamedb)
@@ -254,11 +257,11 @@ class GameDB(object):
 
     def get_turn_timestamp(self):
         v = self.db['turn_timestamp']
-        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5])
+        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5], tzinfo=timezone.utc)
         return dt
 
     def save_turn_timestamp(self):
-        now = datetime.utcnow()
+        now = utcnow()
         self.db['turn_timestamp'] = list(now.utctimetuple())
         self.save()
 
@@ -267,7 +270,7 @@ class GameDB(object):
 
     def get_next_turn_timestamp(self):
         v = self.db['next_turn_timestamp']
-        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5])
+        dt = datetime(v[0], v[1], v[2], v[3], v[4], v[5], tzinfo=timezone.utc)
         return dt
 
     def save_next_turn_timestamp(self, timestamp):
@@ -377,7 +380,7 @@ def main():
                     install_141(args.source)
 
                 gamedb.set_version(args.version)
-                nxt = datetime.utcnow() + timedelta(seconds=gamedb.db['turn_period'])
+                nxt = utcnow() + timedelta(seconds=gamedb.db['turn_period'])
                 gamedb.save_next_turn_timestamp(nxt)
                 gamedb.save_turn_timestamp()
                 gamedb.save()
@@ -389,6 +392,13 @@ def main():
                 dosemu(['DOMEVENT.EXE'])
                 gamedb.increment_turn_timestamp()
             elif args.cmd == 'run':
+                tnow = utcnow()
+                tturn = gamedb.get_next_turn_timestamp()
+                #print("Current UTC time: ", tnow.isoformat())
+                #print("Last turn at: ", gamedb.get_turn_timestamp().isoformat())
+                #print("Next turn at UTC: ", tturn.isoformat())
+                # dt = tturn - tnow
+                # print("That is in %i days, %i seconds from now" % (dt.days, dt.seconds))
                 if args.user is None:
                     while True:
                         username = gamedb.select_user()
